@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mend - Device Health Dashboard</title>
+    <style>
+        /* 1. PERMANENT COLOR PALETTE (Dark Mode / Eco-Friendly) */
+        :root {
+            --bg-main: #121212;         /* Deep Black background */
+            --bg-sidebar: #1e1e1e;      /* Slightly lighter for sidebar */
+            --bg-card: #2c2c2c;         /* Dark Grey for cards */
+            --text-main: #e0e0e0;       /* White-ish text */
+            --text-secondary: #aaaaaa;  /* Grey text */
+            --accent-color: #64b5f6;    /* Soft Blue */
+            --border-color: #444444;    /* Dark borders */
+            --shadow: 0 4px 6px rgba(0,0,0,0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            height: 100vh;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            overflow: hidden;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 250px;
+            background-color: var(--bg-sidebar);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .menu-btn {
+            background-color: transparent;
+            border: 1px solid var(--border-color); /* Changed to border-color for subtlety */
+            color: var(--text-main);
+            padding: 15px;
+            margin-bottom: 10px;
+            text-align: left;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .menu-btn.active {
+            background-color: var(--accent-color);
+            color: #121212; /* Dark text on blue button for contrast */
+            border: none;
+        }
+
+        .menu-btn:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1fr 300px; /* List on left, widgets on right */
+            gap: 40px;
+        }
+
+        /* Section 1: App List */
+        .app-list-section h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .app-item {
+            background-color: var(--bg-card);
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+            border: 1px solid var(--border-color);
+        }
+
+        .badge {
+            background-color: #ff4757; /* Red for high usage */
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        /* Section 2: Widgets (Right Side) */
+        .widgets-column {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            align-items: center;
+        }
+
+        /* Storage Widget */
+        .widget-box {
+            width: 100%;
+            text-align: center;
+        }
+        
+        .storage-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .storage-bar-container {
+            width: 100%;
+            height: 25px;
+            background-color: #444; /* Darker track */
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .storage-fill {
+            height: 100%;
+            width: 75%; 
+            background-color: #2ed573;
+        }
+
+        /* Heat Gauge Widget */
+        .gauge-container {
+            position: relative;
+            width: 200px;
+            height: 100px; /* Half circle */
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .gauge-arc {
+            width: 200px;
+            height: 200px;
+            background: conic-gradient(
+                from 270deg, 
+                #2ed573 0deg, 
+                #ffa502 90deg, 
+                #ff4757 180deg
+            );
+            border-radius: 50%;
+            transform: rotate(-90deg);
+            mask: radial-gradient(transparent 60%, black 61%);
+            -webkit-mask: radial-gradient(transparent 60%, black 61%);
+        }
+
+        .needle {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 4px;
+            height: 90px;
+            background-color: var(--text-main);
+            transform-origin: bottom center;
+            transform: rotate(45deg); /* Pointing to 'High' */
+            transition: transform 0.5s ease;
+        }
+        
+        .gauge-label {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        
+        /* Bottom Bar */
+        .bottom-bar {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 40px;
+            border-top: 1px solid var(--border-color);
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+            background-color: var(--bg-sidebar);
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+            background-color: var(--text-secondary);
+            border-radius: 3px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <button class="menu-btn active">Overall</button>
+        <button class="menu-btn">Recomendations</button>
+        <button class="menu-btn">Settings</button>
+        <button class="menu-btn">Advanced</button>
+        
+        </div>
+
+    <div class="main-content">
+        
+        <div class="app-list-section">
+            <h2>App curr. open using most</h2>
+            
+            <div class="app-item">
+                1) Chrome (Renderer) 
+                <span class="badge">1.2 GB</span>
+            </div>
+            
+            <div class="app-item">
+                2) Slack
+                <span class="badge">450 MB</span>
+            </div>
+            
+            <div class="app-item">
+                3) VS Code
+                <span class="badge">300 MB</span>
+            </div>
+        </div>
+
+        <div class="widgets-column">
+            
+            <div class="widget-box">
+                <div class="storage-label">
+                    <span>% storage</span>
+                    <span>75%</span>
+                </div>
+                <div class="storage-bar-container">
+                    <div class="storage-fill"></div>
+                </div>
+            </div>
+
+            <div class="widget-box">
+                <h3>Total # tabs</h3>
+                <div class="stat-number">12</div>
+            </div>
+
+            <div class="widget-box">
+                <div class="gauge-container">
+                    <div class="gauge-arc"></div>
+                    <div class="needle"></div>
+                </div>
+                <div class="gauge-label">Heat</div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="bottom-bar">
+        <div class="icon"></div>
+        <div class="icon"></div>
+    </div>
+
+</body>
+</html>
