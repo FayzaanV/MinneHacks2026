@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeviceManager</title>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/components.css">
+    <script type="text/javascript" src="/eel.js"></script>
+</head>
+<body>
+    <div class="app-shell">
+        <nav class="sidebar">
+            <div class="logo">This is a placeholder</div>
+            <ul class="nav-links">
+                <li onclick="navigateTo('overall')">Summary</li>
+                <li onclick="navigateTo('recommendations')">Recommendations</li>
+                <li onclick="navigateTo('advanced')">Detailed Metrics</li>
+                <li onclick="navigateTo('settings')">Settings</li>
+            </ul>
+        </nav>
+        <main id="content-area">
+            <h1>Loading System Data...</h1>
+        </main>
+    </div>
+    <script src="js/router.js"></script>
+</body>
+</html>
