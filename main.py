@@ -1,0 +1,1 @@
+print("We will reduce e-waste")
