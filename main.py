@@ -1,15 +1,15 @@
 import eel
 import psutil
-from backend.scanner import cpuPercent, battery, getTopThree
+from backend.scanner import getCpu, getBatteryPer, getTopThree, isCharging
 
 eel.init('frontend')
 @eel.expose
 def get_overall_data():
-    current_cpu = psutil.cpu_percent(interval=None) 
-    current_battery = psutil.sensors_battery().percent
+    batteryInfo = getBatteryPer()
     return{
-        "cpu": current_cpu,
-        "battery": current_battery,
+        "cpu": getCpu(),
+        "battery": batteryInfo.percent if batteryInfo else 100,
+        "isPlugged": isCharging(),
         "apps": getTopThree()
     }
 eel.start('index.html', size=(1024, 768))
