@@ -147,8 +147,9 @@ function updateRecommendations() {
     // Handle Empty State
     if (activeAlerts.length === 0) {
         container.innerHTML = `
-            <div class="flex items-center justify-center h-32 bg-green-500/10 rounded-xl border border-green-500/30">
-                <span class="text-green-400 font-bold tracking-wide">SYSTEM HEALTHY</span>
+            <div class="flex items-center flex-col justify-center h-32 bg-green-500/10 rounded-xl border border-green-500/30">
+                <span class="text-green-400 font-bold tracking-wide">System Healthy</span>
+                <span class="text-green-700 font-light txt-sm">No action needed</span>
             </div>`;
         return;
     }
