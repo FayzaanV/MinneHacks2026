@@ -1,8 +1,10 @@
 # Put functions to get CPU and RAM data in here
 import psutil
+import platform
 from collections import OrderedDict
 import subprocess
 import re
+
 
 def getCpu(): #returns the current cpu usage as a percentage
     cpuPercent = psutil.cpu_percent(1)
@@ -28,6 +30,29 @@ def isCharging(): #returns a boolean true if the computer is plugged in and fals
     else:
         print('The charger is not plugged in')
         return False
+
+def getTemp(): #returns the current temperature of the cpu in celsius
+    os_name = platform.system()
+    if os_name == 'Darwin':
+        print("Temperature information not available on macOS")
+        return None
+    if hasattr(psutil, 'sensors_temperatures'):
+        try:
+            temp = psutil.sensors_temperatures()
+            if 'coretemp' in temp:
+                cpu_temp = temp['coretemp'][0].current
+                print("CPU Temperature:", cpu_temp, '°C')
+                return cpu_temp
+            elif 'cpu_thermal' in temp:
+                cpu_temp = temp['cpu_thermal'][0].current
+                print("CPU Temperature:", cpu_temp, '°C')
+                return cpu_temp
+        except Exception as e:
+            print(f"Could not read sensors: {e}")
+
+    print("Temperature information not available")
+    return 0
+
     
 def batteryHealth(): #returns the percentage of battery capacity currently held compared to new
                      #returns 0 if battery health is not supported, WINDOWS only
