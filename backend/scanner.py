@@ -1,21 +1,18 @@
 # Put functions to get CPU and RAM data in here
 import psutil
 from collections import OrderedDict
+import asyncio
+from bleak import BleakScanner
 
 def getCpu(): #returns the current cpu usage as a percentage
-    cpuPercent = psutil.cpu_percent(0.1)
+    cpuPercent = psutil.cpu_percent(1)
     print("CPU usage:", cpuPercent, '%')
     return cpuPercent
-cpuPercent = psutil.cpu_percent(0.1)
-print("CPU usage:", cpuPercent, '%')
 
 def getRamUsage(): #returns the current ram usage in megabytes
     ramUsed = psutil.virtual_memory().total - psutil.virtual_memory().available
     print("RAM Usage:", ramUsed, 'MB')
     return ramUsed
-ram_raw = psutil.virtual_memory().total - psutil.virtual_memory().available
-ram_MB = ram_raw / (1024 ** 2)
-print("RAM Usage:", ram_MB, 'MB')
 
 def getBatteryPer(): #returns an int battery percentage
     battery = psutil.sensors_battery()
@@ -31,15 +28,46 @@ def isCharging(): #returns a boolean true if the computer is plugged in and fals
     else:
         print('The charger is not plugged in')
         return False
+    
+def getDiskUsage(): #returns the percentage of space used on the disk
+    diskPercent = psutil.disk_usage('/').used / psutil.disk_usage('/').total * 100
+    print(diskPercent, "percent of disk used")
+    return diskPercent
+
+async def strongestBT(): 
+    '''
+    returns a list of the names of the strongest bluetooth signals or an empty list if none
+    are strong
+    this function MUST be called with syntax "asyncio.run(strongestBT())" to work
+    '''
+    signals = await BleakScanner.discover()
+    topSignals = [('FirstDevice', -100), ('SecondDevice', -100), ('ThirdDevice', -100)]
+    for device in signals:
+        rssi = device.metadata.get("rssi")
+        if rssi and rssi > -65:
+            if rssi > topSignals[2][1]:
+                if rssi > topSignals[1][1]:
+                    if rssi > topSignals[0][1]:
+                        topSignals.insert(0, (device.name, device.rssi))
+                        topSignals.pop()
+                        continue
+                    topSignals.insert(1, (device.name, device.rssi))
+                    topSignals.pop()
+                    continue
+                topSignals.insert(2, (device.name, device.rssi))
+                topSignals.pop()
+    topDevices = []
+    for entry in topSignals:
+        if entry[0] == "FirstDevice":
+            return topDevices
+        topDevices.append(entry[0])
+    return topDevices
 
 def getTopThree(): #returns an ordered dictionary of the top three ram using programs running
     bigBadThree = [('First', 0), ('Second', 0), ('Third', 0)]
     for proc in psutil.process_iter(['pid', 'name', 'memory_info']):
         try:
-            mem_info = proc.info.get('memory_info')
-            if mem_info is None:
-                continue
-            memMb = mem_info.rss / (1024 * 1024)
+            memMb = proc.info['memory_info'].rss / (1024 * 1024)
             
             if memMb > bigBadThree[2][1]:
                 if memMb > bigBadThree[1][1]:
@@ -56,12 +84,12 @@ def getTopThree(): #returns an ordered dictionary of the top three ram using pro
         except (psutil.NoSuchProcess, psutil.AccessDenied):
             pass
     dictThree = OrderedDict()
-    print(bigBadThree)
     for i in bigBadThree:
         dictThree[i[0]] = i[1]
     return dictThree
 
-print(getTopThree())
+getDiskUsage()
+print(asyncio.run(strongestBT()))
 
 '''
 print("The top three most intensive programs on memory are:")
