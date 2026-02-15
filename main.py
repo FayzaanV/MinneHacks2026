@@ -1,5 +1,4 @@
 import eel
-import psutil
 from backend.scanner import getCpu, getBatteryPer, getTopThree, isCharging
 
 eel.init('frontend')

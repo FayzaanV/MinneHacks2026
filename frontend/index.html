@@ -3,26 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeviceManager</title>
-    <link rel="stylesheet" href="css/global.css">
-    <link rel="stylesheet" href="css/components.css">
+    <title>diagnOS</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        diagnOS: {
+                            bg: '#121212',
+                            sidebar: '#1e1e1e',
+                            card: '#2c2c2c',
+
+                            dark: '#154e2c',
+                            light: '#70c049',
+
+                            text: '#e0e0e0',
+                            accent: '#70c049',
+                            muted: '#aaaaaa',
+                            border: '#444444'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
     <script type="text/javascript" src="/eel.js"></script>
+
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #70c049; }
+        ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64b5f6; }
+    </style>
 </head>
-<body>
-    <div class="app-shell">
-        <nav class="sidebar">
-            <div class="logo">This is a placeholder</div>
-            <ul class="nav-links">
-                <li onclick="navigateTo('overall')">Summary</li>
-                <li onclick="navigateTo('recommendations')">Recommendations</li>
-                <li onclick="navigateTo('advanced')">Detailed Metrics</li>
-                <li onclick="navigateTo('settings')">Settings</li>
-            </ul>
-        </nav>
-        <main id="content-area">
-            <h1>Loading System Data...</h1>
+<body class="bg-diagnOS-bg text-diagnOS-text h-screen overflow-hidden font-sans antialiased selection:bg-diagnOS-accent selection:text-black">
+
+    <div class="flex h-full">
+        
+        <aside class="w-64 bg-diagnOS-sidebar flex flex-col border-r border-diagnOS-border">
+            
+            <div class="p-6 border-b border-diagnOS-border flex items-center gap-3">
+                <img src="assets/logo-wo-text.png" alt="diagnOS logo" class="w-10 h-10 object-contain">
+                <div>
+                    <h1 class="text-xl font-bold tracking-wide">diagnOS</h1>
+                    <p class="text-xs text-diagnOS-muted">Device Health</p>
+                </div>
+            </div>
+
+            <nav class="flex-1 p-4 space-y-2">
+                <button onclick="navigateTo('overall', this)" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-gray-300 hover:bg-white/5 hover:text-white transition-all group active-btn">
+                    <span class="font-medium">Overall</span>
+                </button>
+
+                <button onclick="navigateTo('advanced', this)" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-gray-300 hover:bg-white/5 hover:text-white transition-all group">
+                    <span class="font-medium">Advanced</span>
+                </button>
+
+                <button onclick="navigateTo('settings', this)" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-gray-300 hover:bg-white/5 hover:text-white transition-all group">
+                    <span class="font-medium">Settings</span>
+                </button>
+            </nav>
+        </aside>
+
+        <main class="flex-1 relative overflow-y-auto">
+            <div id="view-container" class="p-8 max-w-7xl mx-auto">
+                </div>
         </main>
+
     </div>
+
     <script src="js/router.js"></script>
+
+    <script>
+        function updateActiveButton(clickedBtn) {
+            // Remove 'bg-diagnOS-accent text-black' from all buttons
+            document.querySelectorAll('.menu-btn').forEach(btn => {
+                btn.classList.remove('bg-diagnOS-accent', 'text-black', 'font-bold');
+                btn.classList.add('text-gray-300', 'hover:bg-white/5');
+            });
+
+            // Add active styles to clicked button
+            if (clickedBtn) {
+                clickedBtn.classList.remove('text-gray-300', 'hover:bg-white/5');
+                clickedBtn.classList.add('bg-diagnOS-accent', 'text-black', 'font-bold');
+            }
+        }
+    </script>
 </body>
 </html>

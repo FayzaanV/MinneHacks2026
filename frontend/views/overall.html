@@ -1,27 +1,96 @@
-<!DOCTYPE html>
-<html lang="en">
-<div class="app-list-section">
-    <h2>App currently open using most data</h2>
-    <div class="app-item">1) Chrome (Renderer) <span class="badge">1.2 GB</span></div>
-    <div class="app-item">2) Slack <span class="badge">450 MB</span></div>
-    <div class="app-item">3) VS Code <span class="badge">300 MB</span></div>
-</div>
-
-<div class="widgets-column">
-    <div class="widget-box">
-        <div class="storage-label"><span>% storage:</span><span> 75%</span></div>
-        <div class="storage-bar-container"><div class="storage-fill"></div></div>
-    </div>
-    <div class="widget-box">
-        <h3>Total # tabs</h3>
-        <div class="stat-number">12</div>
-    </div>
-    <div class="widget-box">
-        <div class="gauge-container">
-            <div class="gauge-arc"></div>
-            <div class="needle"></div>
+<div class="flex flex-col gap-8 h-full">
+    <div class="grid grid-cols-[1fr_300px] gap-8 h-1/2">
+        <div class="app-list-section">
+            <h2 class="text-3xl font-bold mb-6 text-white flex items-center gap-3">
+                Apps Using Most Memory
+            </h2>
+            <div class="space-y-4" id="list-of-apps">
+                <div class="app-item flex justify-between items-center bg-diagnOS-card p-5 rounded-xl border border-diagnOS-border shadow-md">
+                    <span class="text-xl text-gray-200 font-medium">No data available</span>
+                    <span class="badge bg-gray-500/20 text-gray-400 border border-gray-500/50 px-3 py-1 rounded-lg text-sm font-bold shadow-sm">0 MB</span>
+                </div>
+                <div class="app-item flex justify-between items-center bg-diagnOS-card p-5 rounded-xl border border-diagnOS-border shadow-md">
+                    <span class="text-xl text-gray-200 font-medium">No data available</span>
+                    <span class="badge bg-gray-500/20 text-gray-400 border border-gray-500/50 px-3 py-1 rounded-lg text-sm font-bold shadow-sm">0 MB</span>
+                </div>
+                <div class="app-item flex justify-between items-center bg-diagnOS-card p-5 rounded-xl border border-diagnOS-border shadow-md">
+                    <span class="text-xl text-gray-200 font-medium">No data available</span>
+                    <span class="badge bg-gray-500/20 text-gray-400 border border-gray-500/50 px-3 py-1 rounded-lg text-sm font-bold shadow-sm">0 MB</span>
+                </div>
+            </div>
         </div>
-        <div class="gauge-label">Heat</div>
+
+        <div class="widgets-column flex flex-col gap-6 h-full">
+            
+            <div class="widget-box bg-diagnOS-card p-6 rounded-xl border border-diagnOS-border shadow-lg flex flex-1 flex-col justify-between">
+                <div class="flex justify-between mb-2 font-bold text-gray-400 text-md uppercase tracking-wider">
+                    <span>Battery Level</span>
+                    <span class="text-white">33%</span> 
+                </div>
+                <div class="w-full bg-black/30 rounded-full h-4">
+                    <div class="battery-fill bg-diagnOS-light h-full rounded-full transition-all duration-1000" style="width: 33%"></div>
+                </div>
+                <div class="text-gray-400 mt-2 justify-start text-sm font-normal" >Battery Status: Charging</div>
+            </div>
+
+            <div class="widget-box bg-diagnOS-card p-6 rounded-xl border border-diagnOS-border shadow-lg flex flex-col flex-1 justify-between">
+                <div class="flex justify-between mb-2 font-bold text-gray-400 text-md uppercase tracking-wider">
+                    <span>HD Storage</span>
+                    <span class="hd-text text-white">50% Used</span>
+                </div>
+                
+                <div class="w-full bg-black/30 rounded-full h-4 relative overflow-hidden">
+                    <div class="hd-fill bg-diagnOS-light h-full rounded-full transition-all duration-1000" style="width: 50%"></div>                    
+                </div>
+                
+                <p class="text-xs text-gray-500 mt-2 text-right">256 GB Free of 512 GB</p>
+            </div>
+
+            
+        </div>
+    </div>
+
+    <div class="grid grid-cols-[1fr_300px] gap-8 h-1/2">
+        <div class="recommendations-section">
+            <h2 class="text-3xl font-bold mb-6 text-white flex items-center gap-3">Recommendations</h2>
+            <div id="list-of-recs" class="space-y-4">
+                <div class="rec-item flex justify-between items-center bg-diagnOS-card p-5 rounded-xl border border-diagnOS-border shadow-md">
+                    <div class="flex flex-col">
+                        <span class="text-xl text-gray-200 font-medium">Close Unused Tabs</span>
+                        <span class="text-xs text-gray-500">Chrome is using 1.2GB</span>
+                    </div>
+                </div>
+                <div class="rec-item flex justify-between items-center bg-diagnOS-card p-5 rounded-xl border border-diagnOS-border shadow-md">
+                    <div class="flex flex-col">
+                        <span class="text-xl text-gray-200 font-medium">Clear Cache</span>
+                        <span class="text-xs text-gray-500">Recover 500MB space</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="gauges-column flex flex-col gap-6">
+            
+            <div class="gauge-box bg-diagnOS-card p-4 rounded-xl border border-diagnOS-border shadow-lg flex flex-col items-center justify-center relative">
+                <h3 class="text-gray-400 font-bold uppercase text-sm mb-2">CPU Usage</h3>
+                <div class="relative w-32 h-16 overflow-hidden">
+                    <div class="w-32 h-32 rounded-full border-[12px] border-gray-700 border-b-0 border-l-0 border-r-0 absolute top-0 left-0 box-border"></div>
+                    <div id="cpu-needle" class="absolute bottom-0 left-1/2 w-1 h-16 bg-diagnOS-light origin-bottom transition-transform duration-1000 ease-out" style="transform: rotate(-90deg);"></div>
+                    <div class="absolute bottom-0 left-1/2 w-4 h-4 bg-white rounded-full -translate-x-1/2 translate-y-1/2"></div>
+                </div>
+                <div id="cpu-text" class="text-2xl font-bold text-white mt-2">0%</div>
+            </div>
+
+            <div class="gauge-box bg-diagnOS-card p-4 rounded-xl border border-diagnOS-border shadow-lg flex flex-col items-center justify-center relative">
+                <h3 class="text-gray-400 font-bold uppercase text-sm mb-2">RAM Usage</h3>
+                <div class="relative w-32 h-16 overflow-hidden">
+                    <div class="w-32 h-32 rounded-full border-[12px] border-gray-700 border-b-0 border-l-0 border-r-0 absolute top-0 left-0 box-border"></div>
+                    <div id="ram-needle" class="absolute bottom-0 left-1/2 w-1 h-16 bg-diagnOS-light origin-bottom transition-transform duration-1000 ease-out" style="transform: rotate(-90deg);"></div>
+                    <div class="absolute bottom-0 left-1/2 w-4 h-4 bg-white rounded-full -translate-x-1/2 translate-y-1/2"></div>
+                </div>
+                <div id="ram-text" class="text-2xl font-bold text-white mt-2">0%</div>
+            </div>
+
+        </div>
     </div>
 </div>
-</html>
