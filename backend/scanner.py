@@ -4,7 +4,8 @@ import platform
 from collections import OrderedDict
 import subprocess
 import re
-import wmi
+if platform.system == 'Windows':
+    import wmi
 
 
 def getCpu(): #returns the current cpu usage as a percentage
@@ -127,5 +128,3 @@ def getTopThree(): #returns an ordered dictionary of the top three ram using pro
     for i in bigBadThree:
         dictThree[i[0]] = i[1]
     return dictThree
-
-getTemp()
