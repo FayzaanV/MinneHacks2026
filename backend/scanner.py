@@ -85,8 +85,9 @@ def getTopThree(): #returns an ordered dictionary of the top three ram using pro
         dictThree[i[0]] = i[1]
     return dictThree
 
-print(getTopThree())
+#print(getTopThree())
 print(getTemp())
+#print(getStorageSafe())
 
 '''
 print("The top three most intensive programs on memory are:")
