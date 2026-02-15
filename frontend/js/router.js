@@ -13,6 +13,24 @@ async function navigateTo(viewName) {
 }
 async function getOverallData() {
     const data = await eel.get_overall_data()();
+
+    if (data.disk !== undefined) {
+        const storageText = document.getElementById('storage-percent-text');
+        if (storageText) {
+            storageText.innerText = Math.round(data.disk) + "% Used";
+        }
+        const storageBar = document.getElementById('storage-bar');
+        if (storageBar) {
+            storageBar.style.width = data.disk + "%";
+            
+            // Optional: Turn Red if drive is full (> 90%)
+            if (data.disk > 90) {
+                storageBar.classList.remove('bg-diagnOS-light');
+                storageBar.classList.add('bg-red-500');
+            }
+        }
+    }
+
     console.log("Received Data:", data);
     if (data.battery !== undefined) {
         const battText = document.getElementById('battery-percent-text');
@@ -24,10 +42,8 @@ async function getOverallData() {
             battBar.style.width = data.battery + "%";
             if (data.battery < 20) {
                 battBar.classList.remove('bg-diagnOS-light');
-                battBar.classList.add('bg-red-500');
             } else {
                 battBar.classList.add('bg-diagnOS-light');
-                battBar.classList.remove('bg-red-500');
             }
         }
         const battStatus = document.getElementById('battery-status-text');
@@ -38,24 +54,32 @@ async function getOverallData() {
                 battStatus.innerText = "Battery Status: On Battery";
             }
         }
-        const appListContainer = document.querySelector('#list-of-apps');
-        if (appListContainer && data.apps) {
-            let html = '';
-            Object.entries(data.apps).forEach(([name, mem], index) => {
-                let colorClass = mem > 500 ? "bg-red-500/20 text-red-400 border-red-500/50" : "bg-green-500/20 text-green-400 border-green-500/50";
+    }
+    const appListContainer = document.querySelector('#list-of-apps');
+    if (appListContainer && data.apps) {
+        let html = '';
+        Object.entries(data.apps).forEach(([name, mem], index) => {
+            let colorClass = '';
+            if (mem > 750) {
+                colorClass = "bg-red-500/20 text-red-400 border-red-500/50";
+            } else if (mem > 250) {
+                colorClass = "bg-yellow-500/20 text-yellow-400 border-yellow-500/50";
+            } else {
+                colorClass = "bg-green-500/20 text-green-400 border-green-500/50";
+            }
 
-                html += `
+            html += `
             <div class="app-item flex justify-between items-center bg-diagnOS-card p-5 rounded-xl border border-diagnOS-border shadow-md">
-                <span class="text-xl text-diagnOS-text font-medium">${index + 1}. ${name}</span>
+                <span class="text-xl text-diagnOS-text font-medium">${name}</span>
                 <span class="badge ${colorClass} border px-3 py-1 rounded-lg text-sm font-bold shadow-sm">
                     ${Math.round(mem)} MB
                 </span>
             </div>`;
-            });
-            appListContainer.innerHTML = html;
-        }
+        });
+        appListContainer.innerHTML = html;
     }
 }
+
 window.onload = () => {
     navigateTo('overall');
 };

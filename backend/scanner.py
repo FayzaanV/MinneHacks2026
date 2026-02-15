@@ -106,7 +106,3 @@ def getTopThree():
             continue
         dictThree[i[0]] = i[1]
     return dictThree
-
-print(getBatteryPer())
-print(isCharging())
-print(getTopThree())
