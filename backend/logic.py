@@ -9,7 +9,7 @@ def check_overheating():
         return False
     
 def check_battery_overcharge():
-    if getBatteryPer() >= 80 and isCharging:
+    if getBatteryPer() >= 80 and isCharging():
         return True
     else:
         return False
