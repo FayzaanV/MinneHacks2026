@@ -112,3 +112,15 @@ def getTopThree():
             continue
         dictThree[i[0]] = i[1]
     return dictThree
+
+def processDict():
+    dictOut = {}
+    for proc in psutil.process_iter(['name', 'memory_info']):
+        try:
+            if proc.info['memory_info'] is not None:
+                dictOut[proc.info['name']] = proc.info['memory_info'].rss / (1024 * 1024)
+            else:
+                continue
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            continue
+    return dictOut

@@ -1,49 +1,80 @@
-from scanner import getBatteryPer, getTemp
+# advanced.py
+import eel
+import backend.scanner as scanner
+from backend.scanner import getBatteryPer, getTemp
 import time
 import threading
-import platform
 from datetime import datetime
 
 dataLog = []
-stop = False
+stop_thread = False
 
-def dataOverTime():
-    while not stop:
-        if getBatteryPer() and getTemp():
-            dataLog.append({'Time': datetime.now().strftime("%H:%M:%S"),
-                            'Percent': getBatteryPer(),
-                            'Temperature': getTemp()})
-        elif getBatteryPer():
-            dataLog.append({'Time': datetime.now().strftime("%H:%M:%S"), 
-                            'Percent': getBatteryPer()})
-        else:
-            return None
-        print(dataLog)
-        time.sleep(30)
+def data_collection_loop():
+    global stop_thread
+    while not stop_thread:
+        # Get current stats
+        batt = getBatteryPer()
+        temp = getTemp()
+        
+        # Log data with a timestamp
+        entry = {'Time': datetime.now().strftime("%H:%M:%S")}
+        if batt is not None: entry['Percent'] = batt
+        if temp is not None: entry['Temperature'] = temp
+        
+        dataLog.append(entry)
+        
+        # Keep only the last 20 entries to prevent memory bloat
+        if len(dataLog) > 20:
+            dataLog.pop(0)
+            
+        time.sleep(30) # Collect every 30 seconds
 
-if platform.system == "Darwin":
-    def dataOverTime():
-        if getBatteryPer():
-                dataLog.append({'Time': time.time(), 'Percent': getBatteryPer()})
-        else: 
-            return None
+# In backend/advanced.py
 
+@eel.expose
+def get_advanced_data():
+    # Get the dictionary of all processes
+    all_apps = scanner.processDict()
+    
+    # Sort them by memory usage (value) in descending order and take the top 10
+    top_ten = sorted(all_apps.items(), key=lambda x: x[1], reverse=True)[:10]
+    
+    # Convert list of tuples back to a list of dictionaries for easy JS use
+    # Result looks like: [{"name": "Chrome", "mem": 450}, ...]
+    formatted_apps = [{"name": name, "mem": round(mem, 1)} for name, mem in top_ten]
+    
+    # Get the history log we built earlier
+    history = get_history_data() 
+    
+    return {
+        "history": history,
+        "top_apps": formatted_apps
+    }
 
-t = threading.Thread(target=dataOverTime)
+# In backend/advanced.py
+
+@eel.expose
+def force_log_entry():
+    """Manually triggers a data collection and adds it to the log."""
+    batt = getBatteryPer()
+    temp = getTemp()
+    
+    entry = {'Time': datetime.now().strftime("%H:%M:%S")}
+    if batt is not None: entry['Percent'] = batt
+    if temp is not None: entry['Temperature'] = temp
+    
+    dataLog.append(entry)
+    
+    # Keep the list at 20 entries
+    if len(dataLog) > 20:
+        dataLog.pop(0)
+        
+    return dataLog # Return the updated log immediately
+
+# Start the background thread immediately when imported
+t = threading.Thread(target=data_collection_loop, daemon=True)
 t.start()
 
-
-try:
-    while True:
-        time.sleep(1)
-except KeyboardInterrupt:
-    stop = True
-    t.join()
-    print('stopped')
-
-dataOverTime()
-
-
-
-
-
+@eel.expose
+def get_history_data():
+    return dataLog

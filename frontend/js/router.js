@@ -1,19 +1,23 @@
-let dashboardInterval = null; 
-let activeAlerts = []; // Global storage for current alerts
+let updateInterval = null; 
+let activeAlerts = []; 
 
 async function navigateTo(viewName) {
     try {
-        if (dashboardInterval) clearInterval(dashboardInterval);
-
+        if (updateInterval) {
+            clearInterval(updateInterval);
+            updateInterval = null;
+        }
         const response = await fetch(`./views/${viewName}.html`);
         const html = await response.text();
         const container = document.getElementById('content-area') || document.getElementById('view-container');
         container.innerHTML = html;
-
         if (viewName === 'overall') {
-            await getOverallData(); 
-            // 5-second interval
-            dashboardInterval = setInterval(getOverallData, 3000);
+            await getOverallData();
+            updateInterval = setInterval(getOverallData, 3000);
+        } 
+        else if (viewName === 'advanced') {
+            await getAdvancedData();
+            updateInterval = setInterval(getAdvancedData, 30000);
         }
     } catch (error) {
         console.error("Error loading the view:", error);
@@ -130,7 +134,6 @@ async function getOverallData() {
 
     const incomingAlerts = await eel.get_alerts()();
     incomingAlerts.forEach(incoming => {
-        // Prevent duplicate alerts from stacking up every 5 seconds
         const exists = activeAlerts.some(a => a.title === incoming.title);
         if (!exists) {
             activeAlerts.push(incoming);
@@ -143,8 +146,6 @@ async function getOverallData() {
 function updateRecommendations() {
     const container = document.getElementById('list-of-recs');
     if (!container) return;
-
-    // Handle Empty State
     if (activeAlerts.length === 0) {
         container.innerHTML = `
             <div class="flex items-center flex-col justify-center h-32 bg-green-500/10 rounded-xl border border-green-500/30">
@@ -188,6 +189,109 @@ function updateRecommendations() {
 
     container.innerHTML = html;
 }
+
+async function getAdvancedData() {
+    // Pull the dataLog array from advanced.py
+    const history = await eel.get_history_data()();
+    const listContainer = document.getElementById('history-list');
+    
+    if (!listContainer) return;
+
+    if (!history || history.length === 0) {
+        listContainer.innerHTML = `<div class="text-gray-500 italic p-4">Waiting for data collection thread...</div>`;
+        return;
+    }
+
+    let html = '';
+    // reverse() so the newest data appears at the top
+    [...history].reverse().forEach(entry => {
+        const temp = entry.Temperature ? `${entry.Temperature}°C` : "N/A";
+        const tempColor = entry.Temperature > 85 ? 'text-red-400' : 'text-green-400';
+
+        html += `
+        <div class="flex justify-between items-center bg-diagnOS-card p-4 rounded-xl border border-diagnOS-border mb-3 shadow-sm">
+            <div class="flex flex-col">
+                <span class="text-[10px] text-gray-500 font-mono uppercase tracking-tighter">Timestamp</span>
+                <span class="text-white font-medium">${entry.Time}</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <span class="text-[10px] text-gray-400 uppercase">Battery</span>
+                <span class="text-diagnOS-light font-bold">${entry.Percent}%</span>
+            </div>
+            <div class="flex flex-col items-end">
+                <span class="text-[10px] text-gray-400 uppercase">Temp</span>
+                <span class="${tempColor} font-bold">${temp}</span>
+            </div>
+        </div>`;
+    });
+
+    listContainer.innerHTML = html;
+}
+
+async function getAdvancedData() {
+    const data = await eel.get_advanced_data()();
+    
+    // 1. Handle History (Battery/Temp)
+    const historyContainer = document.getElementById('history-list');
+    if (historyContainer && data.history) {
+        let historyHtml = '';
+        [...data.history].reverse().forEach(entry => {
+            historyHtml += `
+            <div class="flex justify-between items-center bg-diagnOS-card p-4 rounded-xl border border-diagnOS-border shadow-sm">
+                <span class="text-xs text-gray-500 font-mono">${entry.Time}</span>
+                <span class="text-white font-bold">${entry.Percent}%</span>
+                <span class="text-red-400 text-sm">${entry.Temperature || '--'}°C</span>
+            </div>`;
+        });
+        historyContainer.innerHTML = historyHtml;
+    }
+
+    // 2. Handle Top 10 Apps
+    const appContainer = document.getElementById('top-ten-list');
+    if (appContainer && data.top_apps) {
+        let appHtml = '';
+        data.top_apps.forEach((app, index) => {
+            // Add a slight fade for lower-ranked apps
+            const opacity = 1 - (index * 0.05); 
+            appHtml += `
+            <div class="flex justify-between items-center bg-black/20 p-3 rounded-lg border-l-4 border-diagnOS-light" style="opacity: ${opacity}">
+                <div class="flex items-center gap-3">
+                    <span class="text-gray-500 font-bold text-xs w-4">${index + 1}</span>
+                    <span class="text-white text-sm truncate max-w-[150px]">${app.name}</span>
+                </div>
+                <span class="text-diagnOS-light font-mono text-xs font-bold">${app.mem} MB</span>
+            </div>`;
+        });
+        appContainer.innerHTML = appHtml;
+    }
+}
+
+// Add this to the "GLOBAL UTILITIES" section of router.js
+
+window.manualRefresh = async function() {
+    const btn = event.currentTarget;
+    const originalText = btn.innerHTML;
+    
+    // 1. UI Feedback
+    btn.innerHTML = "LOGGING...";
+    btn.disabled = true;
+
+    try {
+        // 2. Tell Python to create a new timestamp entry right now
+        // This returns the updated dataLog with the new entry included
+        await eel.force_log_entry()();
+
+        // 3. Update the UI lists (History and Top 10)
+        await getAdvancedData();
+
+    } catch (error) {
+        console.error("Manual refresh failed:", error);
+    } finally {
+        // 4. Reset Button
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+};
 
 // Attach to window so the HTML 'onclick' can find it
 window.dismissAlert = function(index) {
