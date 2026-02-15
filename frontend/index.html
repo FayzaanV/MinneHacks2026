@@ -3,26 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeviceManager</title>
-    <link rel="stylesheet" href="css/global.css">
-    <link rel="stylesheet" href="css/components.css">
+    <title>diagnOS</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mend: {
+                            bg: '#121212',      /* Deep Black background */
+                            sidebar: '#1e1e1e', /* Slightly lighter sidebar */
+                            card: '#2c2c2c',    /* Dark Grey for cards */
+                            accent: '#64b5f6',  /* Soft Blue */
+                            text: '#e0e0e0',    /* Main White text */
+                            muted: '#aaaaaa',   /* Grey text */
+                            border: '#444444'   /* Dark borders */
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
     <script type="text/javascript" src="/eel.js"></script>
+
+    <style>
+        /* Custom scrollbar for a "Native App" feel */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1e1e1e; }
+        ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64b5f6; }
+    </style>
 </head>
-<body>
-    <div class="app-shell">
-        <nav class="sidebar">
-            <div class="logo">This is a placeholder</div>
-            <ul class="nav-links">
-                <li onclick="navigateTo('overall')">Summary</li>
-                <li onclick="navigateTo('recommendations')">Recommendations</li>
-                <li onclick="navigateTo('advanced')">Detailed Metrics</li>
-                <li onclick="navigateTo('settings')">Settings</li>
-            </ul>
-        </nav>
-        <main id="content-area">
-            <h1>Loading System Data...</h1>
+<body class="bg-mend-bg text-mend-text h-screen overflow-hidden font-sans antialiased selection:bg-mend-accent selection:text-black">
+
+    <div class="flex h-full">
+        
+        <aside class="w-64 bg-mend-sidebar flex flex-col border-r border-mend-border">
+            
+            <div class="p-6 border-b border-mend-border flex items-center gap-3">
+                <span class="material-symbols-outlined text-mend-accent text-4xl">monitor_heart</span>
+                <div>
+                    <h1 class="text-xl font-bold tracking-wide">diagnOS</h1>
+                    <p class="text-xs text-mend-muted">Device Health</p>
+                </div>
+            </div>
+
+            <nav class="flex-1 p-4 space-y-2">
+                <button onclick="navigateTo('overall', this)" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-gray-300 hover:bg-white/5 hover:text-white transition-all group active-btn">
+                    <span class="material-symbols-outlined group-hover:text-mend-accent transition-colors">dashboard</span>
+                    <span class="font-medium">Overall</span>
+                </button>
+
+                <button onclick="navigateTo('recommendations', this)" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-gray-300 hover:bg-white/5 hover:text-white transition-all group">
+                    <span class="material-symbols-outlined group-hover:text-green-400 transition-colors">eco</span>
+                    <span class="font-medium">Recommendations</span>
+                </button>
+
+                <button onclick="navigateTo('advanced', this)" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-gray-300 hover:bg-white/5 hover:text-white transition-all group">
+                    <span class="material-symbols-outlined group-hover:text-purple-400 transition-colors">memory</span>
+                    <span class="font-medium">Advanced</span>
+                </button>
+
+                <button onclick="navigateTo('settings', this)" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-gray-300 hover:bg-white/5 hover:text-white transition-all group">
+                    <span class="material-symbols-outlined group-hover:text-orange-400 transition-colors">settings</span>
+                    <span class="font-medium">Settings</span>
+                </button>
+            </nav>
+
+            <div class="p-4 border-t border-mend-border">
+                <div class="flex items-center gap-3 p-2 rounded-lg bg-mend-card/50">
+                    <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                    <span class="text-xs text-mend-muted">System Active</span>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 relative overflow-y-auto">
+            <div id="view-container" class="p-8 max-w-7xl mx-auto">
+                </div>
         </main>
+
     </div>
+
     <script src="js/router.js"></script>
+
+    <script>
+        function updateActiveButton(clickedBtn) {
+            // Remove 'bg-mend-accent text-black' from all buttons
+            document.querySelectorAll('.menu-btn').forEach(btn => {
+                btn.classList.remove('bg-mend-accent', 'text-black', 'font-bold');
+                btn.classList.add('text-gray-300', 'hover:bg-white/5');
+            });
+
+            // Add active styles to clicked button
+            if (clickedBtn) {
+                clickedBtn.classList.remove('text-gray-300', 'hover:bg-white/5');
+                clickedBtn.classList.add('bg-mend-accent', 'text-black', 'font-bold');
+            }
+        }
+    </script>
 </body>
 </html>
