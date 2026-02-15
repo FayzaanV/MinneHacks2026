@@ -1,5 +1,7 @@
 <div class="flex justify-between items-center mb-6">
+    <!-- Title -->
     <h2 class="text-2xl font-bold text-white uppercase tracking-wider">System History</h2>
+    <!-- Button to manually create new battery timestamps -->
     <button 
         onclick="manualRefresh()" 
         class="flex items-center gap-2 px-4 py-2 bg-diagnOS-light/10 hover:bg-diagnOS-light/20 border border-diagnOS-light/30 rounded-lg text-diagnOS-light text-xs font-bold transition-all active:scale-95"
@@ -8,6 +10,7 @@
     </button>
 </div>
 
+<!-- Two columns for each category of data we display -->
 <div class="grid grid-cols-2 gap-10">
     <div id="history-list" class="space-y-3">...</div>
     <div id="top-ten-list" class="space-y-2">...</div>

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>diagnOS</title>
 
+    <!-- Set tailwind CSS global values -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -45,8 +46,10 @@
 
     <div class="flex h-full">
         
+        <!-- Set a class for the sidebar -->
         <aside class="w-64 bg-diagnOS-sidebar flex flex-col border-r border-diagnOS-border">
             
+            <!-- Div for logo, name, and slogan -->
             <div class="p-6 border-b border-diagnOS-border flex items-center gap-3">
                 <img src="assets/logo-wo-text.png" alt="diagnOS logo" class="w-10 h-10 object-contain">
                 <div>
@@ -55,6 +58,7 @@
                 </div>
             </div>
 
+            <!-- List of three buttons to navigate pages -->
             <nav class="flex-1 p-4 space-y-2">
                 <button onclick="navigateTo('overall', this)" class="menu-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-gray-300 hover:bg-white/5 hover:text-white transition-all group active-btn">
                     <span class="font-medium">Overall</span>
@@ -79,6 +83,7 @@
 
     <script src="js/router.js"></script>
 
+    <!-- Add styles when buttons are clicked or hovered over -->
     <script>
         function updateActiveButton(clickedBtn) {
             // Remove 'bg-diagnOS-accent text-black' from all buttons

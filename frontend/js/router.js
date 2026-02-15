@@ -1,6 +1,7 @@
 let updateInterval = null; 
 let activeAlerts = []; 
 
+// This function connects each sidebar button to it's respective page and enables navigation
 async function navigateTo(viewName) {
     try {
         if (updateInterval) {
@@ -24,9 +25,11 @@ async function navigateTo(viewName) {
     }
 }
 
+// This function populates the overall.html page with a summary of the most important computer data
 async function getOverallData() {
     const data = await eel.get_overall_data()();
 
+    // Get RAM data
     if (data.ram !== undefined) {
         const ramText = document.getElementById('ram-text');
         const ramNeedle = document.getElementById('ram-needle');
@@ -46,6 +49,7 @@ async function getOverallData() {
         }
     }
 
+    // Get CPU data
     if (data.cpu !== undefined) {
         const cpuText = document.getElementById('cpu-text');
         if (cpuText) {
@@ -70,6 +74,7 @@ async function getOverallData() {
         }
     }
 
+    // Get HD data
     if (data.disk !== undefined) {
         const storageText = document.getElementById('storage-percent-text');
         if (storageText) {
@@ -85,6 +90,7 @@ async function getOverallData() {
         }
     }
 
+    // Get battery data
     if (data.battery !== undefined) {
         const battText = document.getElementById('battery-percent-text');
         if (battText) {
@@ -108,6 +114,8 @@ async function getOverallData() {
             }
         }
     }
+
+    // Get top three apps
     const appListContainer = document.querySelector('#list-of-apps');
     if (appListContainer && data.apps) {
         let html = '';
@@ -132,6 +140,7 @@ async function getOverallData() {
         appListContainer.innerHTML = html;
     }
 
+    // Each time we update the data look if the criteria are met for an alert and add it to the list
     const incomingAlerts = await eel.get_alerts()();
     incomingAlerts.forEach(incoming => {
         const exists = activeAlerts.some(a => a.title === incoming.title);
@@ -143,9 +152,11 @@ async function getOverallData() {
     updateRecommendations();
 }
 
+// Check if there is any alert and display the appropriate cause and responses
 function updateRecommendations() {
     const container = document.getElementById('list-of-recs');
     if (!container) return;
+    // If no alerts, show that everything is good
     if (activeAlerts.length === 0) {
         container.innerHTML = `
             <div class="flex items-center flex-col justify-center h-32 bg-green-500/10 rounded-xl border border-green-500/30">
@@ -155,6 +166,7 @@ function updateRecommendations() {
         return;
     }
 
+    // Style depending onf class of the alert
     let html = '';
     activeAlerts.forEach((alert, index) => {
         const isDanger = alert.type === 'danger';
@@ -190,10 +202,9 @@ function updateRecommendations() {
     container.innerHTML = html;
 }
 
+// Gets advanced data from the separate python file and displays it in the advanced section of the application
 async function getAdvancedData() {
     const data = await eel.get_advanced_data()();
-    
-    // 1. Handle History (Battery/Temp)
     const historyContainer = document.getElementById('history-list');
     if (historyContainer && data.history) {
         let historyHtml = '';
@@ -208,15 +219,13 @@ async function getAdvancedData() {
         historyContainer.innerHTML = historyHtml;
     }
 
-    // 2. Handle Top 10 Apps
+    // Show top ten apps
     const appContainer = document.getElementById('top-ten-list');
     if (appContainer && data.top_apps) {
         let appHtml = '';
         data.top_apps.forEach((app, index) => {
-            // Add a slight fade for lower-ranked apps
-            const opacity = 1 - (index * 0.05); 
             appHtml += `
-            <div class="flex justify-between items-center bg-black/20 p-3 rounded-lg border-l-4 border-diagnOS-light" style="opacity: ${opacity}">
+            <div class="flex justify-between items-center bg-black/20 p-3 rounded-lg border-l-4 border-diagnOS-light">
                 <div class="flex items-center gap-3">
                     <span class="text-gray-500 font-bold text-xs w-4">${index + 1}</span>
                     <span class="text-white text-sm truncate max-w-[150px]">${app.name}</span>
@@ -228,8 +237,7 @@ async function getAdvancedData() {
     }
 }
 
-// Add this to the "GLOBAL UTILITIES" section of router.js
-
+// Code for the manual refresh button to add a new timestamp for the battery and temperature tracker
 window.manualRefresh = async function() {
     const btn = event.currentTarget;
     const originalText = btn.innerHTML;
@@ -238,10 +246,7 @@ window.manualRefresh = async function() {
     btn.disabled = true;
 
     try {
-        // 1. PYTHON CALL: Must match 'def force_log_entry' (snake_case)
-        await eel.force_log_entry()(); 
-
-        // 2. JAVASCRIPT CALL: Must match 'async function getAdvancedData' (camelCase)
+        await eel.force_log_entry()();
         await getAdvancedData(); 
 
     } catch (error) {
@@ -252,14 +257,13 @@ window.manualRefresh = async function() {
     }
 };
 
-// Attach to window so the HTML 'onclick' can find it
+// Enables user to dismiss alerts once they have been resolved
 window.dismissAlert = function(index) {
     activeAlerts.splice(index, 1);
     updateRecommendations();
 };
 
-// This fires as soon as the browser window finishes loading
+// Automatically loads overall.html on launch
 window.addEventListener('DOMContentLoaded', () => {
-    // Force the app to load the dashboard immediately
     navigateTo('overall');
 });
