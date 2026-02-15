@@ -112,3 +112,13 @@ def getTopThree():
             continue
         dictThree[i[0]] = i[1]
     return dictThree
+
+def processDict():
+    dictOut = {}
+    for proc in psutil.process_iter(['name', 'memory_info']):
+        dictOut[proc.info['name']] = proc.info['memory_info'].rss / (1024 * 1024)
+    print(dictOut)
+    return dictOut
+
+
+processDict()
