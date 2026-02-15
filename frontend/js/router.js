@@ -147,7 +147,6 @@ function updateRecommendations(alerts) {
         html += `
         <div class="rec-item flex flex-col p-5 rounded-xl border shadow-lg ${bgClass} ${borderClass} mb-4">
             <div class="flex items-center gap-3 mb-2">
-                <span class="text-2xl">${icon}</span>
                 <h3 class="text-xl font-bold ${titleColor} uppercase tracking-wide">${alert.title}</h3>
             </div>
             <p class="text-sm text-gray-300 italic mb-4 border-l-2 ${isDanger ? 'border-red-500/30' : 'border-yellow-500/30'} pl-3">
