@@ -1,4 +1,5 @@
 import eel
+import backend.advanced
 from backend.scanner import getCpu, getBatteryPer, getTopThree, isCharging, getRamPerc, getDiskUsage
 import backend.logic as logic
 

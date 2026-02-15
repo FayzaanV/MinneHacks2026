@@ -1,49 +1,37 @@
-from scanner import getBatteryPer, getTemp
+# advanced.py
+import eel
+from backend.scanner import getBatteryPer, getTemp
 import time
 import threading
-import platform
 from datetime import datetime
 
 dataLog = []
-stop = False
+stop_thread = False
 
-def dataOverTime():
-    while not stop:
-        if getBatteryPer() and getTemp():
-            dataLog.append({'Time': datetime.now().strftime("%H:%M:%S"),
-                            'Percent': getBatteryPer(),
-                            'Temperature': getTemp()})
-        elif getBatteryPer():
-            dataLog.append({'Time': datetime.now().strftime("%H:%M:%S"), 
-                            'Percent': getBatteryPer()})
-        else:
-            return None
-        print(dataLog)
-        time.sleep(30)
+def data_collection_loop():
+    global stop_thread
+    while not stop_thread:
+        # Get current stats
+        batt = getBatteryPer()
+        temp = getTemp()
+        
+        # Log data with a timestamp
+        entry = {'Time': datetime.now().strftime("%H:%M:%S")}
+        if batt is not None: entry['Percent'] = batt
+        if temp is not None: entry['Temperature'] = temp
+        
+        dataLog.append(entry)
+        
+        # Keep only the last 20 entries to prevent memory bloat
+        if len(dataLog) > 20:
+            dataLog.pop(0)
+            
+        time.sleep(30) # Collect every 30 seconds
 
-if platform.system == "Darwin":
-    def dataOverTime():
-        if getBatteryPer():
-                dataLog.append({'Time': time.time(), 'Percent': getBatteryPer()})
-        else: 
-            return None
-
-
-t = threading.Thread(target=dataOverTime)
+# Start the background thread immediately when imported
+t = threading.Thread(target=data_collection_loop, daemon=True)
 t.start()
 
-
-try:
-    while True:
-        time.sleep(1)
-except KeyboardInterrupt:
-    stop = True
-    t.join()
-    print('stopped')
-
-dataOverTime()
-
-
-
-
-
+@eel.expose
+def get_history_data():
+    return dataLog
