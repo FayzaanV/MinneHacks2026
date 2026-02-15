@@ -127,41 +127,52 @@ function updateRecommendations(alerts) {
     const container = document.getElementById('list-of-recs');
     if (!container) return;
 
-    // If no alerts, show a "Healthy" message
+    // 1. CLEAR STATE (If no alerts)
     if (alerts.length === 0) {
         container.innerHTML = `
-            <div class="flex items-center justify-center h-32 bg-green-500/10 rounded-xl border border-green-500/30">
-                <div class="text-center">
-                    <div class="text-4xl mb-2">✅</div>
-                    <span class="text-green-400 font-bold">System Healthy</span>
-                    <p class="text-sm text-green-500/70">No actions needed</p>
-                </div>
+            <div class="flex flex-col items-center justify-center h-48 bg-green-500/10 rounded-xl border border-green-500/30 p-6 text-center">
+                <div class="text-4xl mb-3">✅</div>
+                <h3 class="text-green-400 font-bold text-lg">System is Healthy</h3>
+                <p class="text-sm text-green-500/70 max-w-xs">Your hardware is operating within optimal parameters. No actions required.</p>
             </div>`;
         return;
     }
 
-    // If alerts exist, build the HTML
+    // 2. BUILD ALERTS HTML
     let html = '';
     alerts.forEach(alert => {
-        // Choose colors: Red for Danger, Yellow for Warning
         const isDanger = alert.type === 'danger';
+        
+        // Dynamic Styling
         const borderClass = isDanger ? 'border-red-500/50' : 'border-yellow-500/50';
-        const bgClass = isDanger ? 'bg-red-500/10' : 'bg-yellow-500/10';
-        const textClass = isDanger ? 'text-red-400' : 'text-yellow-400';
-        const icon = isDanger ? '🔥' : '⚠️';
+        const bgClass = isDanger ? 'bg-red-500/5' : 'bg-yellow-500/5'; // Lower opacity for background
+        const titleColor = isDanger ? 'text-red-400' : 'text-yellow-400';
+        const icon = isDanger ? '🔥' : '⚡';
+
+        // Generate the List Items (<li>)
+        const stepsHtml = alert.steps.map(step => 
+            `<li class="text-gray-400 text-sm mb-1 list-disc list-inside">${step}</li>`
+        ).join('');
 
         html += `
-        <div class="rec-item flex justify-between items-center p-5 rounded-xl border shadow-md ${bgClass} ${borderClass}">
-            <div class="flex flex-col">
-                <span class="text-xl font-bold ${textClass} flex items-center gap-2">
-                    ${icon} ${alert.title}
-                </span>
-                <span class="text-sm text-gray-400 mt-1">${alert.message}</span>
+        <div class="rec-item flex flex-col p-5 rounded-xl border shadow-lg ${bgClass} ${borderClass} mb-4">
+            
+            <div class="flex items-center gap-3 mb-2">
+                <span class="text-2xl">${icon}</span>
+                <h3 class="text-xl font-bold ${titleColor} uppercase tracking-wide">${alert.title}</h3>
+            </div>
+
+            <p class="text-sm text-gray-300 italic mb-4 border-l-2 ${isDanger ? 'border-red-500/30' : 'border-yellow-500/30'} pl-3">
+                "${alert.why}"
+            </p>
+
+            <div class="bg-black/20 rounded-lg p-3">
+                <span class="text-xs font-bold text-gray-500 uppercase block mb-2">Recommended Actions:</span>
+                <ul class="space-y-1">
+                    ${stepsHtml}
+                </ul>
             </div>
             
-            <button class="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-xs text-white border border-gray-600 transition-colors">
-                Fix
-            </button>
         </div>`;
     });
 
