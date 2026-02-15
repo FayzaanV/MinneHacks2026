@@ -2,16 +2,17 @@ async function navigateTo(viewName) {
     try {
         const response = await fetch(`./views/${viewName}.html`);
         const html = await response.text();
-        document.getElementById('content-area').innerHTML = html;
-        if (viewName === 'overall' || viewName === 'advanced') {
-            updateDataFromPython();
+        const container = document.getElementById('content-area') || document.getElementById('view-container');
+        container.innerHTML = html;
+        if (viewName === 'overall') {
+            await getOverallData(); 
         }
     } catch (error) {
         console.error("Error loading the view:", error);
     }
 }
 async function getOverallData(){
-    const data = eel.get_overall_data()();
+    const data = await eel.get_overall_data()();
     const appList = document.querySelector('.app-list-section');
     if(appList) {
         let html = '<h2>App curr. open using the most</h2>';
