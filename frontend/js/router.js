@@ -154,7 +154,7 @@ function updateRecommendations() {
             </div>`;
         return;
     }
-    
+
     let html = '';
     activeAlerts.forEach((alert, index) => {
         const isDanger = alert.type === 'danger';
@@ -226,6 +226,44 @@ async function getAdvancedData() {
     });
 
     listContainer.innerHTML = html;
+}
+
+async function getAdvancedData() {
+    const data = await eel.get_advanced_data()();
+    
+    // 1. Handle History (Battery/Temp)
+    const historyContainer = document.getElementById('history-list');
+    if (historyContainer && data.history) {
+        let historyHtml = '';
+        [...data.history].reverse().forEach(entry => {
+            historyHtml += `
+            <div class="flex justify-between items-center bg-diagnOS-card p-4 rounded-xl border border-diagnOS-border shadow-sm">
+                <span class="text-xs text-gray-500 font-mono">${entry.Time}</span>
+                <span class="text-white font-bold">${entry.Percent}%</span>
+                <span class="text-red-400 text-sm">${entry.Temperature || '--'}°C</span>
+            </div>`;
+        });
+        historyContainer.innerHTML = historyHtml;
+    }
+
+    // 2. Handle Top 10 Apps
+    const appContainer = document.getElementById('top-ten-list');
+    if (appContainer && data.top_apps) {
+        let appHtml = '';
+        data.top_apps.forEach((app, index) => {
+            // Add a slight fade for lower-ranked apps
+            const opacity = 1 - (index * 0.05); 
+            appHtml += `
+            <div class="flex justify-between items-center bg-black/20 p-3 rounded-lg border-l-4 border-diagnOS-light" style="opacity: ${opacity}">
+                <div class="flex items-center gap-3">
+                    <span class="text-gray-500 font-bold text-xs w-4">${index + 1}</span>
+                    <span class="text-white text-sm truncate max-w-[150px]">${app.name}</span>
+                </div>
+                <span class="text-diagnOS-light font-mono text-xs font-bold">${app.mem} MB</span>
+            </div>`;
+        });
+        appContainer.innerHTML = appHtml;
+    }
 }
 
 // Attach to window so the HTML 'onclick' can find it
