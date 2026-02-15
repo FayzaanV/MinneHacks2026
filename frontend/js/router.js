@@ -13,17 +13,27 @@ async function navigateTo(viewName) {
 }
 async function getOverallData(){
     const data = await eel.get_overall_data()();
-    const appList = document.querySelector('.app-list-section');
-    if(appList) {
-        let html = '<h2>App curr. open using the most</h2>';
+    const appListContainer = document.querySelector('#list-of-apps');
+    if(appListContainer && data.apps) {
+        let html = '';
         Object.entries(data.apps).forEach(([name, mem], index) => {
+            let colorClass = '';
+            if (mem > 750) {
+                colorClass = "bg-red-500/20 text-red-400 border-red-500/50";
+            } else if (mem > 250) {
+                colorClass = "bg-yellow-500/20 text-yellow-400 border-yellow-500/50";
+            } else {
+                colorClass = "bg-green-500/20 text-green-400 border-green-500/50";
+            }
             html += `
-                <div class="app-item">
-                    ${index + 1}) ${name} 
-                    <span class="badge">${Math.round(mem)} MB</span>
-                </div>`;
+            <div class="app-item flex justify-between items-center bg-mend-card p-5 rounded-xl border border-mend-border shadow-md hover:scale-[1.02] transition-transform">
+                <span class="text-xl text-gray-200 font-medium">${name}</span>
+                <span class="badge ${colorClass} border px-3 py-1 rounded-lg text-sm font-bold shadow-sm">
+                    ${Math.round(mem)} MB
+                </span>
+            </div>`;
         });
-        appList.innerHTML = html;
+        appListContainer.innerHTML = html;
     }
 }
 window.onload = () => {
