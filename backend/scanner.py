@@ -44,6 +44,9 @@ def getTemp(): #returns the current temperature of the cpu in celsius
     if hasattr(psutil, 'sensors_temperatures'):
         try:
             temp = psutil.sensors_temperatures()
+            if not temp:
+                return None
+            
             if 'coretemp' in temp:
                 cpu_temp = temp['coretemp'][0].current
                 print("CPU Temperature:", cpu_temp, '°C')
@@ -56,7 +59,7 @@ def getTemp(): #returns the current temperature of the cpu in celsius
             print(f"Could not read sensors: {e}")
 
     print("Temperature information not available")
-    return 0
+    return None
 
     
 def batteryHealth(): #returns the percentage of battery capacity currently held compared to new
