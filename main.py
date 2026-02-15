@@ -70,7 +70,7 @@ def get_alerts():
 
     if logic.check_high_cpu():
         alerts.append({
-            "type": "danger", # Changed to 'danger' because >90% is critical
+            "type": "danger",
             "title": "Processor Overload",
             "why": "Running at maximum capacity causes system freezes, input lag, and generates excessive heat that can throttle performance.",
             "steps": [

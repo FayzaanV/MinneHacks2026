@@ -16,7 +16,7 @@ def getCpu():
     print("CPU usage:", cpuPercent, '%')
     return cpuPercent
 
-def getRamUsage(): #returns the current ram usage in megabytes
+def getRamUsage():
     '''
     returns an int representing the amount of ram in use in megabytes
     '''
