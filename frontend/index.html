@@ -11,14 +11,18 @@
             theme: {
                 extend: {
                     colors: {
-                        mend: {
-                            bg: '#121212',      /* Deep Black background */
-                            sidebar: '#1e1e1e', /* Slightly lighter sidebar */
-                            card: '#2c2c2c',    /* Dark Grey for cards */
-                            accent: '#64b5f6',  /* Soft Blue */
-                            text: '#e0e0e0',    /* Main White text */
-                            muted: '#aaaaaa',   /* Grey text */
-                            border: '#444444'   /* Dark borders */
+                        diagnOS: {
+                            bg: '#121212',
+                            sidebar: '#1e1e1e',
+                            card: '#2c2c2c',
+
+                            dark: '#154e2c',
+                            light: '#70c049',
+
+                            text: '#e0e0e0',
+                            accent: '#70c049',
+                            muted: '#aaaaaa',
+                            border: '#444444'
                         }
                     }
                 }
@@ -31,24 +35,23 @@
     <script type="text/javascript" src="/eel.js"></script>
 
     <style>
-        /* Custom scrollbar for a "Native App" feel */
         ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #1e1e1e; }
+        ::-webkit-scrollbar-track { background: #70c049; }
         ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #64b5f6; }
     </style>
 </head>
-<body class="bg-mend-bg text-mend-text h-screen overflow-hidden font-sans antialiased selection:bg-mend-accent selection:text-black">
+<body class="bg-diagnOS-bg text-diagnOS-text h-screen overflow-hidden font-sans antialiased selection:bg-diagnOS-accent selection:text-black">
 
     <div class="flex h-full">
         
-        <aside class="w-64 bg-mend-sidebar flex flex-col border-r border-mend-border">
+        <aside class="w-64 bg-diagnOS-sidebar flex flex-col border-r border-diagnOS-border">
             
-            <div class="p-6 border-b border-mend-border flex items-center gap-3">
+            <div class="p-6 border-b border-diagnOS-border flex items-center gap-3">
                 <img src="assets/logo-wo-text.png" alt="diagnOS logo" class="w-10 h-10 object-contain">
                 <div>
                     <h1 class="text-xl font-bold tracking-wide">diagnOS</h1>
-                    <p class="text-xs text-mend-muted">Device Health</p>
+                    <p class="text-xs text-diagnOS-muted">Device Health</p>
                 </div>
             </div>
 
@@ -70,10 +73,10 @@
                 </button>
             </nav>
 
-            <div class="p-4 border-t border-mend-border">
-                <div class="flex items-center gap-3 p-2 rounded-lg bg-mend-card/50">
+            <div class="p-4 border-t border-diagnOS-border">
+                <div class="flex items-center gap-3 p-2 rounded-lg bg-diagnOS-card/50">
                     <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                    <span class="text-xs text-mend-muted">System Active</span>
+                    <span class="text-xs text-diagnOS-muted">System Active</span>
                 </div>
             </div>
         </aside>
@@ -89,16 +92,16 @@
 
     <script>
         function updateActiveButton(clickedBtn) {
-            // Remove 'bg-mend-accent text-black' from all buttons
+            // Remove 'bg-diagnOS-accent text-black' from all buttons
             document.querySelectorAll('.menu-btn').forEach(btn => {
-                btn.classList.remove('bg-mend-accent', 'text-black', 'font-bold');
+                btn.classList.remove('bg-diagnOS-accent', 'text-black', 'font-bold');
                 btn.classList.add('text-gray-300', 'hover:bg-white/5');
             });
 
             // Add active styles to clicked button
             if (clickedBtn) {
                 clickedBtn.classList.remove('text-gray-300', 'hover:bg-white/5');
-                clickedBtn.classList.add('bg-mend-accent', 'text-black', 'font-bold');
+                clickedBtn.classList.add('bg-diagnOS-accent', 'text-black', 'font-bold');
             }
         }
     </script>
