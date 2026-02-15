@@ -1,4 +1,6 @@
-# advanced.py
+'''
+collects data over time for the advanced page
+'''
 import eel
 import backend.scanner as scanner
 from backend.scanner import getBatteryPer, getTemp
@@ -9,41 +11,38 @@ from datetime import datetime
 dataLog = []
 stop_thread = False
 
-def data_collection_loop():
+def dataCollectionLoop():
+    '''
+    loop modifies the list dataLog by adding a new dictionary with a time and battery percentage
+    every 30 seconds
+    '''
     global stop_thread
     while not stop_thread:
-        # Get current stats
+
         batt = getBatteryPer()
         temp = getTemp()
         
-        # Log data with a timestamp
         entry = {'Time': datetime.now().strftime("%H:%M:%S")}
         if batt is not None: entry['Percent'] = batt
         if temp is not None: entry['Temperature'] = temp
         
         dataLog.append(entry)
         
-        # Keep only the last 20 entries to prevent memory bloat
         if len(dataLog) > 20:
             dataLog.pop(0)
             
-        time.sleep(30) # Collect every 30 seconds
-
-# In backend/advanced.py
+        time.sleep(30) 
 
 @eel.expose
 def get_advanced_data():
-    # Get the dictionary of all processes
+    '''
+    returns a dictionary containing the battery history from dataCollectionLoop and the top 10
+    most RAM-heavy processes running
+    '''
+
     all_apps = scanner.processDict()
-    
-    # Sort them by memory usage (value) in descending order and take the top 10
     top_ten = sorted(all_apps.items(), key=lambda x: x[1], reverse=True)[:10]
-    
-    # Convert list of tuples back to a list of dictionaries for easy JS use
-    # Result looks like: [{"name": "Chrome", "mem": 450}, ...]
     formatted_apps = [{"name": name, "mem": round(mem, 1)} for name, mem in top_ten]
-    
-    # Get the history log we built earlier
     history = get_history_data() 
     
     return {
@@ -51,11 +50,11 @@ def get_advanced_data():
         "top_apps": formatted_apps
     }
 
-# In backend/advanced.py
-
 @eel.expose
-def force_log_entry():
-    """Manually triggers a data collection and adds it to the log."""
+def forceLogEntry():
+    '''
+    Manually triggers a data collection and adds it to the log
+    '''
     batt = getBatteryPer()
     temp = getTemp()
     
@@ -65,16 +64,18 @@ def force_log_entry():
     
     dataLog.append(entry)
     
-    # Keep the list at 20 entries
     if len(dataLog) > 20:
         dataLog.pop(0)
         
-    return dataLog # Return the updated log immediately
+    return dataLog
 
-# Start the background thread immediately when imported
-t = threading.Thread(target=data_collection_loop, daemon=True)
+t = threading.Thread(target=dataCollectionLoop, daemon=True)
 t.start()
 
 @eel.expose
 def get_history_data():
+    '''
+    returns the last 20 battery percentages collected by dataCollectionLoop with timestamps 
+    as a list of dictionaries
+    '''
     return dataLog

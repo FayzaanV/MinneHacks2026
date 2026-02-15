@@ -192,7 +192,7 @@ function updateRecommendations() {
 
 async function getAdvancedData() {
     // Pull the dataLog array from advanced.py
-    const history = await eel.get_history_data()();
+    const history = await eel.getHistoryData()();
     const listContainer = document.getElementById('history-list');
     
     if (!listContainer) return;
@@ -229,7 +229,7 @@ async function getAdvancedData() {
 }
 
 async function getAdvancedData() {
-    const data = await eel.get_advanced_data()();
+    const data = await eel.getAdvancedData()();
     
     // 1. Handle History (Battery/Temp)
     const historyContainer = document.getElementById('history-list');
@@ -279,7 +279,7 @@ window.manualRefresh = async function() {
     try {
         // 2. Tell Python to create a new timestamp entry right now
         // This returns the updated dataLog with the new entry included
-        await eel.force_log_entry()();
+        await eel.forceLogEntry()();
 
         // 3. Update the UI lists (History and Top 10)
         await getAdvancedData();

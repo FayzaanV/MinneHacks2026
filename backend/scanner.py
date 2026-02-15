@@ -8,26 +8,41 @@ if platform.system == 'Windows':
     import wmi
 
 
-def getCpu(): #returns the current cpu usage as a percentage
+def getCpu(): 
+    '''
+    returns a float representing the current cpu usage as a percentage
+    '''
     cpuPercent = psutil.cpu_percent(0.1)
     print("CPU usage:", cpuPercent, '%')
     return cpuPercent
 
 def getRamUsage(): #returns the current ram usage in megabytes
+    '''
+    returns an int representing the amount of ram in use in megabytes
+    '''
     ramUsed = psutil.virtual_memory().total - psutil.virtual_memory().available
     print("RAM Usage:", ramUsed, 'MB')
     return ramUsed
 
-def getRamPerc(): #return RAM usage as a percent of available RAM
+def getRamPerc(): 
+    '''
+    returns a float representing the amount of RAM in use as a percentage
+    '''
     return psutil.virtual_memory().percent
 
-def getBatteryPer(): #returns an int battery percentage
+def getBatteryPer(): 
+    '''
+    returns an int representing the percentage of battery available
+    '''
     battery = psutil.sensors_battery()
     if battery is None: return 100
     print("Battery:", battery.percent, '%')
     return battery.percent
 
-def isCharging(): #returns a boolean true if the computer is plugged in and false if not
+def isCharging():
+    '''
+    returns a boolean of true if the computer is plugged in to a charger and false if not
+    '''
     battery = psutil.sensors_battery()
     isPlugged = battery.power_plugged
     if isPlugged:
@@ -37,7 +52,10 @@ def isCharging(): #returns a boolean true if the computer is plugged in and fals
         print('The charger is not plugged in')
         return False
 
-def getTemp(): #returns the current temperature of the cpu in celsius
+def getTemp(): 
+    '''
+    returns a float representing the current temperature of the cpu in celcius
+    '''
     if platform.system() == 'Darwin':
         print("Temperature information not available on macOS")
         return None
@@ -62,8 +80,13 @@ def getTemp(): #returns the current temperature of the cpu in celsius
     return None
 
     
-def batteryHealth(): #returns the percentage of battery capacity currently held compared to new
-                     #returns 0 if battery health is not supported, WINDOWS only
+def batteryHealth():
+    '''
+    returns a float representing the percentage of battery capacity currently available to the
+    battery compared to when it was new
+    returns None if the function is not supported
+    Only compatible with Windows
+    '''
     subprocess.run(["powercfg", "/batteryreport", "/output", "batteryReport.html"])
     with open('batteryReport.html', 'r', encoding="utf-8", errors="ignore") as f:
         file = f.read() 
@@ -78,14 +101,21 @@ def batteryHealth(): #returns the percentage of battery capacity currently held 
     if designCap and fullCap: 
         health = fullCap / designCap * 100
         return health
-    return 0
+    return None
     
-def getDiskUsage(): #returns the percentage of space used on the disk
+def getDiskUsage():
+    '''
+    returns a float representing the percent of space used on the disk
+    '''
     diskPercent = psutil.disk_usage('/').used / psutil.disk_usage('/').total * 100
     print(diskPercent, "percent of disk used")
     return diskPercent
     
 def getTopThree(): 
+    '''
+    returns and ordered dictionary with the names of the three processes using the most memory
+    in descending order
+    '''
     bigBadThree = [('First', 0), ('Second', 0), ('Third', 0)]
     for proc in psutil.process_iter(['name', 'memory_info']):
         try:
@@ -114,6 +144,10 @@ def getTopThree():
     return dictThree
 
 def processDict():
+    '''
+    returns a dictionary with the name of every process running andthe amount of memory each
+    one is using
+    '''
     dictOut = {}
     for proc in psutil.process_iter(['name', 'memory_info']):
         try:
