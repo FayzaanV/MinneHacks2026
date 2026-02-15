@@ -3,8 +3,6 @@ import psutil
 from collections import OrderedDict
 import subprocess
 import re
-#import asyncio
-#from bleak import BleakScanner
 
 def getCpu(): #returns the current cpu usage as a percentage
     cpuPercent = psutil.cpu_percent(1)
@@ -53,35 +51,6 @@ def getDiskUsage(): #returns the percentage of space used on the disk
     diskPercent = psutil.disk_usage('/').used / psutil.disk_usage('/').total * 100
     print(diskPercent, "percent of disk used")
     return diskPercent
-
-'''
-async def strongestBT(): 
-    #returns a list of the names of the strongest bluetooth signals or an empty list if none
-    #are strong
-    #this function MUST be called with syntax "asyncio.run(strongestBT())" to work
-    signals = await BleakScanner.discover()
-    topSignals = [('FirstDevice', -100), ('SecondDevice', -100), ('ThirdDevice', -100)]
-    for device in signals:
-        rssi = device.metadata.get("rssi")
-        if rssi and rssi > -65:
-            if rssi > topSignals[2][1]:
-                if rssi > topSignals[1][1]:
-                    if rssi > topSignals[0][1]:
-                        topSignals.insert(0, (device.name, device.rssi))
-                        topSignals.pop()
-                        continue
-                    topSignals.insert(1, (device.name, device.rssi))
-                    topSignals.pop()
-                    continue
-                topSignals.insert(2, (device.name, device.rssi))
-                topSignals.pop()
-    topDevices = []
-    for entry in topSignals:
-        if entry[0] == "FirstDevice":
-            return topDevices
-        topDevices.append(entry[0])
-    return topDevices
-'''
     
 def getTopThree(): #returns an ordered dictionary of the top three ram using programs running
     bigBadThree = [('First', 0), ('Second', 0), ('Third', 0)]
@@ -108,12 +77,3 @@ def getTopThree(): #returns an ordered dictionary of the top three ram using pro
         dictThree[i[0]] = i[1]
     return dictThree
 
-getDiskUsage()
-print('Battery health:', batteryHealth())
-
-'''
-print("The top three most intensive programs on memory are:")
-topThree = getTopThree()
-for entry in topThree:
-    print(entry[0], ':', entry[1], 'MB')
-'''
