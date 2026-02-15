@@ -1,18 +1,11 @@
-let dashboardInterval = null;
-
 async function navigateTo(viewName) {
     try {
-        if (dashboardInterval) {
-            clearInterval(dashboardInterval);
-            dashboardInterval = null;
-        }
         const response = await fetch(`./views/${viewName}.html`);
         const html = await response.text();
         const container = document.getElementById('content-area') || document.getElementById('view-container');
         container.innerHTML = html;
         if (viewName === 'overall') {
             await getOverallData();
-            dashboardInterval = setInterval(getOverallData, 5000);
         }
     } catch (error) {
         console.error("Error loading the view:", error);
