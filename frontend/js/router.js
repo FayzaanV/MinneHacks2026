@@ -14,6 +14,30 @@ async function navigateTo(viewName) {
 async function getOverallData() {
     const data = await eel.get_overall_data()();
 
+    if (data.cpu !== undefined) {
+        const cpuText = document.getElementById('cpu-text');
+        if (cpuText) {
+            cpuText.innerText = Math.round(data.cpu) + "%";
+        }
+        const cpuNeedle = document.getElementById('cpu-needle');
+        if (cpuNeedle) {
+            const degrees = (data.cpu * 1.8) - 90;
+            cpuNeedle.style.transform = `rotate(${degrees}deg)`;
+            cpuNeedle.classList.remove('bg-diagnOS-light', 'bg-red-500', 'bg-yellow-500');
+            cpuText.classList.remove('text-white', 'text-red-500', 'text-yellow-500');
+            if (data.cpu > 90) {
+                cpuNeedle.classList.add('bg-red-500');
+                cpuNeedle.classList.add('txt-red-500');
+            } else if (data.cpu > 70) {
+                cpuNeedle.classList.add('bg-yellow-500');
+                cpuNeedle.classList.add('txt-yellow-500');
+            } else {
+                cpuNeedle.classList.add('bg-diagnOS-light');
+                cpuNeedle.classList.add('txt-white');
+            }
+        }
+    }
+
     if (data.disk !== undefined) {
         const storageText = document.getElementById('storage-percent-text');
         if (storageText) {
@@ -22,8 +46,6 @@ async function getOverallData() {
         const storageBar = document.getElementById('storage-bar');
         if (storageBar) {
             storageBar.style.width = data.disk + "%";
-            
-            // Optional: Turn Red if drive is full (> 90%)
             if (data.disk > 90) {
                 storageBar.classList.remove('bg-diagnOS-light');
                 storageBar.classList.add('bg-red-500');
