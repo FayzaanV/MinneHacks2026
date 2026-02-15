@@ -26,7 +26,7 @@ async function getOverallData(){
                 colorClass = "bg-green-500/20 text-green-400 border-green-500/50";
             }
             html += `
-            <div class="app-item flex justify-between items-center bg-diagnOS-card p-5 rounded-xl border border-diagnOS-border shadow-md hover:scale-[1.02] transition-transform">
+            <div class="app-item flex justify-between items-center bg-diagnOS-card p-5 rounded-xl border border-diagnOS-border shadow-md">
                 <span class="text-xl text-diagnOS-text font-medium">${name}</span>
                 <span class="badge ${colorClass} border px-3 py-1 rounded-lg text-sm font-bold shadow-sm">
                     ${Math.round(mem)} MB
