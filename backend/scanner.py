@@ -2,11 +2,12 @@
 import psutil
 from collections import OrderedDict
 
-cpuPercent = psutil.cpu_percent(1)
+cpuPercent = psutil.cpu_percent(0.1)
 print("CPU usage:", cpuPercent, '%')
 
-ramUsed = psutil.virtual_memory().total - psutil.virtual_memory().available
-print("RAM Usage:", ramUsed, 'MB')
+ram_raw = psutil.virtual_memory().total - psutil.virtual_memory().available
+ram_MB = ram_raw / (1024 ** 2)
+print("RAM Usage:", ram_MB, 'MB')
 
 
 
@@ -22,7 +23,10 @@ def getTopThree():
     bigBadThree = [('First', 0), ('Second', 0), ('Third', 0)]
     for proc in psutil.process_iter(['pid', 'name', 'memory_info']):
         try:
-            mem_mb = proc.info['memory_info'].rss / (1024 * 1024)
+            mem_info = proc.info.get('memory_info')
+            if mem_info is None:
+                continue
+            mem_mb = mem_info.rss / (1024 * 1024)
             
             if mem_mb > bigBadThree[2][1]:
                 if mem_mb > bigBadThree[1][1]:
