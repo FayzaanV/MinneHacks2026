@@ -1,11 +1,12 @@
 import eel
-from backend.scanner import getCpu, getBatteryPer, getTopThree, isCharging, getDiskUsage
+from backend.scanner import getCpu, getBatteryPer, getTopThree, isCharging, getDiskUsage, getRamPerc
 
 eel.init('frontend')
 @eel.expose
 def get_overall_data():
     return{
         "cpu": getCpu(),
+        "ram": getRamPerc(),
         "battery": getBatteryPer(),
         "isCharging": isCharging(),
         "apps": getTopThree(),

@@ -18,6 +18,9 @@ def getRamUsage(): #returns the current ram usage in megabytes
     print("RAM Usage:", ramUsed, 'MB')
     return ramUsed
 
+def getRamPerc(): #return RAM usage as a percent of available RAM
+    return psutil.virtual_memory().percent
+
 def getBatteryPer(): #returns an int battery percentage
     battery = psutil.sensors_battery()
     if battery is None: return 100

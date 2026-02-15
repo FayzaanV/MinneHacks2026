@@ -14,6 +14,25 @@ async function navigateTo(viewName) {
 async function getOverallData() {
     const data = await eel.get_overall_data()();
 
+    if (data.ram !== undefined) {
+        const ramText = document.getElementById('ram-text');
+        const ramNeedle = document.getElementById('ram-needle');
+        if (ramNeedle && ramText) {
+            ramText.innerText = Math.round(data.ram) + "%";
+            const degrees = (data.ram * 1.8) - 90;
+            ramNeedle.style.transform = `rotate(${degrees}deg)`;
+            ramNeedle.classList.remove('bg-diagnOS-light', 'bg-red-500', 'bg-yellow-500');
+            ramText.classList.remove('text-white', 'text-red-500', 'text-yellow-500');
+            if (data.ram > 90) {
+                ramNeedle.classList.add('bg-red-500');
+                ramText.classList.add('text-red-500');
+            } else {
+                ramNeedle.classList.add('bg-diagnOS-light');
+                ramText.classList.add('text-white');
+            }
+        }
+    }
+
     if (data.cpu !== undefined) {
         const cpuText = document.getElementById('cpu-text');
         if (cpuText) {
