@@ -1,21 +1,18 @@
 # Put functions to get CPU and RAM data in here
 import psutil
 from collections import OrderedDict
+import subprocess
+import re
 
 def getCpu(): #returns the current cpu usage as a percentage
-    cpuPercent = psutil.cpu_percent(0.1)
+    cpuPercent = psutil.cpu_percent(1)
     print("CPU usage:", cpuPercent, '%')
     return cpuPercent
-cpuPercent = psutil.cpu_percent(0.1)
-print("CPU usage:", cpuPercent, '%')
 
 def getRamUsage(): #returns the current ram usage in megabytes
     ramUsed = psutil.virtual_memory().total - psutil.virtual_memory().available
     print("RAM Usage:", ramUsed, 'MB')
     return ramUsed
-ram_raw = psutil.virtual_memory().total - psutil.virtual_memory().available
-ram_MB = ram_raw / (1024 ** 2)
-print("RAM Usage:", ram_MB, 'MB')
 
 def getBatteryPer(): #returns an int battery percentage
     battery = psutil.sensors_battery()
@@ -31,15 +28,35 @@ def isCharging(): #returns a boolean true if the computer is plugged in and fals
     else:
         print('The charger is not plugged in')
         return False
-
+    
+def batteryHealth(): #returns the percentage of battery capacity currently held compared to new
+                     #returns 0 if battery health is not supported, WINDOWS only
+    subprocess.run(["powercfg", "/batteryreport", "/output", "batteryReport.html"])
+    with open('batteryReport.html', 'r', encoding="utf-8", errors="ignore") as f:
+        file = f.read() 
+    def find_value(target):
+        match = re.search(target + r".*?([0-9,]+) mWh", file)
+        if match:
+            return int(match.group(1).replace(",", ""))
+        else:
+            return None
+    designCap = find_value('DESIGN CAPACITY')
+    fullCap = find_value('FULL CHARGE CAPACITY')
+    if designCap and fullCap: 
+        health = fullCap / designCap * 100
+        return health
+    return 0
+    
+def getDiskUsage(): #returns the percentage of space used on the disk
+    diskPercent = psutil.disk_usage('/').used / psutil.disk_usage('/').total * 100
+    print(diskPercent, "percent of disk used")
+    return diskPercent
+    
 def getTopThree(): #returns an ordered dictionary of the top three ram using programs running
     bigBadThree = [('First', 0), ('Second', 0), ('Third', 0)]
     for proc in psutil.process_iter(['pid', 'name', 'memory_info']):
         try:
-            mem_info = proc.info.get('memory_info')
-            if mem_info is None:
-                continue
-            memMb = mem_info.rss / (1024 * 1024)
+            memMb = proc.info['memory_info'].rss / (1024 * 1024)
             
             if memMb > bigBadThree[2][1]:
                 if memMb > bigBadThree[1][1]:
@@ -56,16 +73,7 @@ def getTopThree(): #returns an ordered dictionary of the top three ram using pro
         except (psutil.NoSuchProcess, psutil.AccessDenied):
             pass
     dictThree = OrderedDict()
-    print(bigBadThree)
     for i in bigBadThree:
         dictThree[i[0]] = i[1]
     return dictThree
 
-print(getTopThree())
-
-'''
-print("The top three most intensive programs on memory are:")
-topThree = getTopThree()
-for entry in topThree:
-    print(entry[0], ':', entry[1], 'MB')
-'''
