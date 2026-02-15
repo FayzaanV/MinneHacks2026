@@ -1,8 +1,10 @@
 # Put functions to get CPU and RAM data in here
 import psutil
 from collections import OrderedDict
-import asyncio
-from bleak import BleakScanner
+import subprocess
+import re
+#import asyncio
+#from bleak import BleakScanner
 
 def getCpu(): #returns the current cpu usage as a percentage
     cpuPercent = psutil.cpu_percent(1)
@@ -29,17 +31,34 @@ def isCharging(): #returns a boolean true if the computer is plugged in and fals
         print('The charger is not plugged in')
         return False
     
+def batteryHealth(): #returns the percentage of battery capacity currently held compared to new
+                     #returns 0 if battery health is not supported, WINDOWS only
+    subprocess.run(["powercfg", "/batteryreport", "/output", "batteryReport.html"])
+    with open('batteryReport.html', 'r', encoding="utf-8", errors="ignore") as f:
+        file = f.read() 
+    def find_value(target):
+        match = re.search(target + r".*?([0-9,]+) mWh", file)
+        if match:
+            return int(match.group(1).replace(",", ""))
+        else:
+            return None
+    designCap = find_value('DESIGN CAPACITY')
+    fullCap = find_value('FULL CHARGE CAPACITY')
+    if designCap and fullCap: 
+        health = fullCap / designCap * 100
+        return health
+    return 0
+    
 def getDiskUsage(): #returns the percentage of space used on the disk
     diskPercent = psutil.disk_usage('/').used / psutil.disk_usage('/').total * 100
     print(diskPercent, "percent of disk used")
     return diskPercent
 
+'''
 async def strongestBT(): 
-    '''
-    returns a list of the names of the strongest bluetooth signals or an empty list if none
-    are strong
-    this function MUST be called with syntax "asyncio.run(strongestBT())" to work
-    '''
+    #returns a list of the names of the strongest bluetooth signals or an empty list if none
+    #are strong
+    #this function MUST be called with syntax "asyncio.run(strongestBT())" to work
     signals = await BleakScanner.discover()
     topSignals = [('FirstDevice', -100), ('SecondDevice', -100), ('ThirdDevice', -100)]
     for device in signals:
@@ -62,7 +81,8 @@ async def strongestBT():
             return topDevices
         topDevices.append(entry[0])
     return topDevices
-
+'''
+    
 def getTopThree(): #returns an ordered dictionary of the top three ram using programs running
     bigBadThree = [('First', 0), ('Second', 0), ('Third', 0)]
     for proc in psutil.process_iter(['pid', 'name', 'memory_info']):
@@ -89,7 +109,7 @@ def getTopThree(): #returns an ordered dictionary of the top three ram using pro
     return dictThree
 
 getDiskUsage()
-print(asyncio.run(strongestBT()))
+print('Battery health:', batteryHealth())
 
 '''
 print("The top three most intensive programs on memory are:")
