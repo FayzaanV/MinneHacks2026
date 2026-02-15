@@ -4,6 +4,7 @@ import platform
 from collections import OrderedDict
 import subprocess
 import re
+import wmi
 
 
 def getCpu(): #returns the current cpu usage as a percentage
@@ -32,8 +33,7 @@ def isCharging(): #returns a boolean true if the computer is plugged in and fals
         return False
 
 def getTemp(): #returns the current temperature of the cpu in celsius
-    os_name = platform.system()
-    if os_name == 'Darwin':
+    if platform.system() == 'Darwin':
         print("Temperature information not available on macOS")
         return None
     if hasattr(psutil, 'sensors_temperatures'):
@@ -78,23 +78,27 @@ def getDiskUsage(): #returns the percentage of space used on the disk
     return diskPercent
 
 def getTemp(): #returns the current temperature of the cpu in celsius
-    os_name = platform.system()
-    if os_name == 'Darwin':
+    if platform.system() == 'Darwin':
         print("Temperature information not available on macOS")
         return None
-    if hasattr(psutil, 'sensors_temperatures'):
-        try:
-            temp = psutil.sensors_temperatures()
-            if 'coretemp' in temp:
-                cpu_temp = temp['coretemp'][0].current
-                print("CPU Temperature:", cpu_temp, '°C')
-                return cpu_temp
-            elif 'cpu_thermal' in temp:
-                cpu_temp = temp['cpu_thermal'][0].current
-                print("CPU Temperature:", cpu_temp, '°C')
-                return cpu_temp
-        except Exception as e:
-            print(f"Could not read sensors: {e}")
+    connect = wmi.WMI(namespace="root\\wmi")
+    for temp in connect.MSAcpi_ThermalZoneTemperature():
+        celcius = temp.CurrentTemperature / 10 - 273.15
+        print(celcius)
+        return celcius
+    # if hasattr(psutil, 'sensors_temperatures'):
+    #     try:
+    #         temp = psutil.sensors_temperatures()
+    #         if 'coretemp' in temp:
+    #             cpu_temp = temp['coretemp'][0].current
+    #             print("CPU Temperature:", cpu_temp, '°C')
+    #             return cpu_temp
+    #         elif 'cpu_thermal' in temp:
+    #             cpu_temp = temp['cpu_thermal'][0].current
+    #             print("CPU Temperature:", cpu_temp, '°C')
+    #             return cpu_temp
+    #     except Exception as e:
+    #         print(f"Could not read sensors: {e}")
 
     print("Temperature information not available")
     return 0
@@ -124,3 +128,4 @@ def getTopThree(): #returns an ordered dictionary of the top three ram using pro
         dictThree[i[0]] = i[1]
     return dictThree
 
+getTemp()
