@@ -72,7 +72,6 @@ async function getOverallData() {
         }
     }
 
-    console.log("Received Data:", data);
     if (data.battery !== undefined) {
         const battText = document.getElementById('battery-percent-text');
         if (battText) {
@@ -119,6 +118,54 @@ async function getOverallData() {
         });
         appListContainer.innerHTML = html;
     }
+
+    const alerts = await eel.get_alerts()();
+    updateRecommendations(alerts);
+}
+
+function updateRecommendations(alerts) {
+    const container = document.getElementById('list-of-recs');
+    if (!container) return;
+
+    // If no alerts, show a "Healthy" message
+    if (alerts.length === 0) {
+        container.innerHTML = `
+            <div class="flex items-center justify-center h-32 bg-green-500/10 rounded-xl border border-green-500/30">
+                <div class="text-center">
+                    <div class="text-4xl mb-2">✅</div>
+                    <span class="text-green-400 font-bold">System Healthy</span>
+                    <p class="text-sm text-green-500/70">No actions needed</p>
+                </div>
+            </div>`;
+        return;
+    }
+
+    // If alerts exist, build the HTML
+    let html = '';
+    alerts.forEach(alert => {
+        // Choose colors: Red for Danger, Yellow for Warning
+        const isDanger = alert.type === 'danger';
+        const borderClass = isDanger ? 'border-red-500/50' : 'border-yellow-500/50';
+        const bgClass = isDanger ? 'bg-red-500/10' : 'bg-yellow-500/10';
+        const textClass = isDanger ? 'text-red-400' : 'text-yellow-400';
+        const icon = isDanger ? '🔥' : '⚠️';
+
+        html += `
+        <div class="rec-item flex justify-between items-center p-5 rounded-xl border shadow-md ${bgClass} ${borderClass}">
+            <div class="flex flex-col">
+                <span class="text-xl font-bold ${textClass} flex items-center gap-2">
+                    ${icon} ${alert.title}
+                </span>
+                <span class="text-sm text-gray-400 mt-1">${alert.message}</span>
+            </div>
+            
+            <button class="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-xs text-white border border-gray-600 transition-colors">
+                Fix
+            </button>
+        </div>`;
+    });
+
+    container.innerHTML = html;
 }
 
 window.onload = () => {
