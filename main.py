@@ -1,14 +1,15 @@
 import eel
-from backend.scanner import getCpu, getBatteryPer, getTopThree, isCharging
+from backend.scanner import getCpu, getBatteryPer, getTopThree, isCharging, getDiskUsage, getRamPerc
 
 eel.init('frontend')
 @eel.expose
 def get_overall_data():
-    batteryInfo = getBatteryPer()
     return{
         "cpu": getCpu(),
-        "battery": batteryInfo.percent if batteryInfo else 100,
-        "isPlugged": isCharging(),
-        "apps": getTopThree()
+        "ram": getRamPerc(),
+        "battery": getBatteryPer(),
+        "isCharging": isCharging(),
+        "apps": getTopThree(),
+        "disk": getDiskUsage()
     }
 eel.start('index.html', size=(1024, 768))

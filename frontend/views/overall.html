@@ -25,25 +25,23 @@
             <div class="widget-box bg-diagnOS-card p-6 rounded-xl border border-diagnOS-border shadow-lg flex flex-1 flex-col justify-between">
                 <div class="flex justify-between mb-2 font-bold text-gray-400 text-md uppercase tracking-wider">
                     <span>Battery Level</span>
-                    <span class="text-white">33%</span> 
+                    <span id="battery-percent-text" class="text-white">--%</span> 
                 </div>
                 <div class="w-full bg-black/30 rounded-full h-4">
-                    <div class="battery-fill bg-diagnOS-light h-full rounded-full transition-all duration-1000" style="width: 33%"></div>
+                    <div id="battery-bar" class="battery-fill bg-diagnOS-light h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
                 </div>
-                <div class="text-gray-400 mt-2 justify-start text-sm font-normal" >Battery Status: Charging</div>
+                <div id="battery-status-text" class="text-gray-400 mt-2 justify-start text-sm font-normal" >Battery Status: Unknown</div>
             </div>
 
             <div class="widget-box bg-diagnOS-card p-6 rounded-xl border border-diagnOS-border shadow-lg flex flex-col flex-1 justify-between">
                 <div class="flex justify-between mb-2 font-bold text-gray-400 text-md uppercase tracking-wider">
                     <span>HD Storage</span>
-                    <span class="hd-text text-white">50% Used</span>
+                    <span id="storage-percent-text" class="hd-text text-white">--% Used</span>
                 </div>
                 
                 <div class="w-full bg-black/30 rounded-full h-4 relative overflow-hidden">
-                    <div class="hd-fill bg-diagnOS-light h-full rounded-full transition-all duration-1000" style="width: 50%"></div>                    
+                    <div id="storage-bar" class="hd-fill bg-diagnOS-light h-full rounded-full transition-all duration-1000" style="width: 0%"></div>                    
                 </div>
-                
-                <p class="text-xs text-gray-500 mt-2 text-right">256 GB Free of 512 GB</p>
             </div>
 
             
