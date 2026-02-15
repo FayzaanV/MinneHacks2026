@@ -28,10 +28,8 @@ if platform.system == "Darwin":
         else: 
             return None
 
-
 t = threading.Thread(target=dataOverTime)
 t.start()
-
 
 try:
     while True:
@@ -40,8 +38,6 @@ except KeyboardInterrupt:
     stop = True
     t.join()
     print('stopped')
-
-dataOverTime()
 
 
 
