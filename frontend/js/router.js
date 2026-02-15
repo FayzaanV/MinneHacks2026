@@ -266,6 +266,33 @@ async function getAdvancedData() {
     }
 }
 
+// Add this to the "GLOBAL UTILITIES" section of router.js
+
+window.manualRefresh = async function() {
+    const btn = event.currentTarget;
+    const originalText = btn.innerHTML;
+    
+    // 1. UI Feedback
+    btn.innerHTML = "LOGGING...";
+    btn.disabled = true;
+
+    try {
+        // 2. Tell Python to create a new timestamp entry right now
+        // This returns the updated dataLog with the new entry included
+        await eel.force_log_entry()();
+
+        // 3. Update the UI lists (History and Top 10)
+        await getAdvancedData();
+
+    } catch (error) {
+        console.error("Manual refresh failed:", error);
+    } finally {
+        // 4. Reset Button
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+};
+
 // Attach to window so the HTML 'onclick' can find it
 window.dismissAlert = function(index) {
     activeAlerts.splice(index, 1);

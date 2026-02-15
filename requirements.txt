@@ -1,1 +1,4 @@
-Put python libraries in here.
+psutil
+platform
+eel
+wmi (Windows only)

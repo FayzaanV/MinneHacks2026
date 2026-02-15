@@ -51,6 +51,26 @@ def get_advanced_data():
         "top_apps": formatted_apps
     }
 
+# In backend/advanced.py
+
+@eel.expose
+def force_log_entry():
+    """Manually triggers a data collection and adds it to the log."""
+    batt = getBatteryPer()
+    temp = getTemp()
+    
+    entry = {'Time': datetime.now().strftime("%H:%M:%S")}
+    if batt is not None: entry['Percent'] = batt
+    if temp is not None: entry['Temperature'] = temp
+    
+    dataLog.append(entry)
+    
+    # Keep the list at 20 entries
+    if len(dataLog) > 20:
+        dataLog.pop(0)
+        
+    return dataLog # Return the updated log immediately
+
 # Start the background thread immediately when imported
 t = threading.Thread(target=data_collection_loop, daemon=True)
 t.start()
