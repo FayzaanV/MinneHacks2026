@@ -9,7 +9,7 @@ if platform.system == 'Windows':
 
 
 def getCpu(): #returns the current cpu usage as a percentage
-    cpuPercent = psutil.cpu_percent(1)
+    cpuPercent = psutil.cpu_percent(0.1)
     print("CPU usage:", cpuPercent, '%')
     return cpuPercent
 
@@ -20,8 +20,9 @@ def getRamUsage(): #returns the current ram usage in megabytes
 
 def getBatteryPer(): #returns an int battery percentage
     battery = psutil.sensors_battery()
+    if battery is None: return 100
     print("Battery:", battery.percent, '%')
-    return battery
+    return battery.percent
 
 def isCharging(): #returns a boolean true if the computer is plugged in and false if not
     battery = psutil.sensors_battery()
@@ -77,39 +78,14 @@ def getDiskUsage(): #returns the percentage of space used on the disk
     diskPercent = psutil.disk_usage('/').used / psutil.disk_usage('/').total * 100
     print(diskPercent, "percent of disk used")
     return diskPercent
-
-def getTemp(): #returns the current temperature of the cpu in celsius
-    if platform.system() == 'Darwin':
-        print("Temperature information not available on macOS")
-        return None
-    connect = wmi.WMI(namespace="root\\wmi")
-    for temp in connect.MSAcpi_ThermalZoneTemperature():
-        celcius = temp.CurrentTemperature / 10 - 273.15
-        print(celcius)
-        return celcius
-    # if hasattr(psutil, 'sensors_temperatures'):
-    #     try:
-    #         temp = psutil.sensors_temperatures()
-    #         if 'coretemp' in temp:
-    #             cpu_temp = temp['coretemp'][0].current
-    #             print("CPU Temperature:", cpu_temp, '°C')
-    #             return cpu_temp
-    #         elif 'cpu_thermal' in temp:
-    #             cpu_temp = temp['cpu_thermal'][0].current
-    #             print("CPU Temperature:", cpu_temp, '°C')
-    #             return cpu_temp
-    #     except Exception as e:
-    #         print(f"Could not read sensors: {e}")
-
-    print("Temperature information not available")
-    return 0
     
-def getTopThree(): #returns an ordered dictionary of the top three ram using programs running
+def getTopThree(): 
     bigBadThree = [('First', 0), ('Second', 0), ('Third', 0)]
-    for proc in psutil.process_iter(['pid', 'name', 'memory_info']):
+    for proc in psutil.process_iter(['name', 'memory_info']):
         try:
+            if proc.info['memory_info'] is None:
+                continue
             memMb = proc.info['memory_info'].rss / (1024 * 1024)
-            
             if memMb > bigBadThree[2][1]:
                 if memMb > bigBadThree[1][1]:
                     if memMb > bigBadThree[0][1]:
@@ -126,5 +102,11 @@ def getTopThree(): #returns an ordered dictionary of the top three ram using pro
             pass
     dictThree = OrderedDict()
     for i in bigBadThree:
+        if i[0] in ['First', 'Second', 'Third'] and i[1] == 0:
+            continue
         dictThree[i[0]] = i[1]
     return dictThree
+
+print(getBatteryPer())
+print(isCharging())
+print(getTopThree())
