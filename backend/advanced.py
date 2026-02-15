@@ -51,7 +51,7 @@ def get_advanced_data():
     }
 
 @eel.expose
-def forceLogEntry():
+def force_log_entry():
     '''
     Manually triggers a data collection and adds it to the log
     '''

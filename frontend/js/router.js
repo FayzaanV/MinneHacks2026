@@ -191,45 +191,7 @@ function updateRecommendations() {
 }
 
 async function getAdvancedData() {
-    // Pull the dataLog array from advanced.py
-    const history = await eel.getHistoryData()();
-    const listContainer = document.getElementById('history-list');
-    
-    if (!listContainer) return;
-
-    if (!history || history.length === 0) {
-        listContainer.innerHTML = `<div class="text-gray-500 italic p-4">Waiting for data collection thread...</div>`;
-        return;
-    }
-
-    let html = '';
-    // reverse() so the newest data appears at the top
-    [...history].reverse().forEach(entry => {
-        const temp = entry.Temperature ? `${entry.Temperature}°C` : "N/A";
-        const tempColor = entry.Temperature > 85 ? 'text-red-400' : 'text-green-400';
-
-        html += `
-        <div class="flex justify-between items-center bg-diagnOS-card p-4 rounded-xl border border-diagnOS-border mb-3 shadow-sm">
-            <div class="flex flex-col">
-                <span class="text-[10px] text-gray-500 font-mono uppercase tracking-tighter">Timestamp</span>
-                <span class="text-white font-medium">${entry.Time}</span>
-            </div>
-            <div class="flex flex-col items-center">
-                <span class="text-[10px] text-gray-400 uppercase">Battery</span>
-                <span class="text-diagnOS-light font-bold">${entry.Percent}%</span>
-            </div>
-            <div class="flex flex-col items-end">
-                <span class="text-[10px] text-gray-400 uppercase">Temp</span>
-                <span class="${tempColor} font-bold">${temp}</span>
-            </div>
-        </div>`;
-    });
-
-    listContainer.innerHTML = html;
-}
-
-async function getAdvancedData() {
-    const data = await eel.getAdvancedData()();
+    const data = await eel.get_advanced_data()();
     
     // 1. Handle History (Battery/Temp)
     const historyContainer = document.getElementById('history-list');
@@ -272,22 +234,19 @@ window.manualRefresh = async function() {
     const btn = event.currentTarget;
     const originalText = btn.innerHTML;
     
-    // 1. UI Feedback
     btn.innerHTML = "LOGGING...";
     btn.disabled = true;
 
     try {
-        // 2. Tell Python to create a new timestamp entry right now
-        // This returns the updated dataLog with the new entry included
-        await eel.forceLogEntry()();
+        // 1. PYTHON CALL: Must match 'def force_log_entry' (snake_case)
+        await eel.force_log_entry()(); 
 
-        // 3. Update the UI lists (History and Top 10)
-        await getAdvancedData();
+        // 2. JAVASCRIPT CALL: Must match 'async function getAdvancedData' (camelCase)
+        await getAdvancedData(); 
 
     } catch (error) {
         console.error("Manual refresh failed:", error);
     } finally {
-        // 4. Reset Button
         btn.innerHTML = originalText;
         btn.disabled = false;
     }
