@@ -1,12 +1,27 @@
+let dashboardInterval = null;
+
 async function navigateTo(viewName) {
     try {
+        // 1. Stop any running timer from the previous page
+        if (dashboardInterval) {
+            clearInterval(dashboardInterval);
+            dashboardInterval = null;
+        }
+
         const response = await fetch(`./views/${viewName}.html`);
         const html = await response.text();
         const container = document.getElementById('content-area') || document.getElementById('view-container');
         container.innerHTML = html;
+
+        // 2. If we are on the 'overall' page, start the loop
         if (viewName === 'overall') {
+            // Run immediately once
             await getOverallData();
+            
+            // Then run every 5 seconds (5000 ms)
+            dashboardInterval = setInterval(getOverallData, 5000);
         }
+
     } catch (error) {
         console.error("Error loading the view:", error);
     }
