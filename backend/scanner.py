@@ -21,7 +21,7 @@ def getRamUsage(): #returns the current ram usage in megabytes
 def getBatteryPer(): #returns an int battery percentage
     battery = psutil.sensors_battery()
     print("Battery:", battery.percent, '%')
-    return battery
+    return battery.percent
 
 def isCharging(): #returns a boolean true if the computer is plugged in and false if not
     battery = psutil.sensors_battery()
@@ -40,6 +40,9 @@ def getTemp(): #returns the current temperature of the cpu in celsius
     if hasattr(psutil, 'sensors_temperatures'):
         try:
             temp = psutil.sensors_temperatures()
+            if not temp:
+                return None
+            
             if 'coretemp' in temp:
                 cpu_temp = temp['coretemp'][0].current
                 print("CPU Temperature:", cpu_temp, '°C')
@@ -52,7 +55,7 @@ def getTemp(): #returns the current temperature of the cpu in celsius
             print(f"Could not read sensors: {e}")
 
     print("Temperature information not available")
-    return 0
+    return None
 
     
 def batteryHealth(): #returns the percentage of battery capacity currently held compared to new
@@ -78,15 +81,15 @@ def getDiskUsage(): #returns the percentage of space used on the disk
     print(diskPercent, "percent of disk used")
     return diskPercent
 
-def getTemp(): #returns the current temperature of the cpu in celsius
-    if platform.system() == 'Darwin':
-        print("Temperature information not available on macOS")
-        return None
-    connect = wmi.WMI(namespace="root\\wmi")
-    for temp in connect.MSAcpi_ThermalZoneTemperature():
-        celcius = temp.CurrentTemperature / 10 - 273.15
-        print(celcius)
-        return celcius
+# def getTemp(): #returns the current temperature of the cpu in celsius
+#     if platform.system() == 'Darwin':
+#         print("Temperature information not available on macOS")
+#         return None
+#     connect = wmi.WMI(namespace="root\\wmi")
+#     for temp in connect.MSAcpi_ThermalZoneTemperature():
+#         celcius = temp.CurrentTemperature / 10 - 273.15
+#         print(celcius)
+#         return celcius
     # if hasattr(psutil, 'sensors_temperatures'):
     #     try:
     #         temp = psutil.sensors_temperatures()
