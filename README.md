@@ -25,4 +25,7 @@ What Did We Learn?
 Building this program taught us how accessibility can change the function of our operating system. Having the ability to extract data from the device itself is a new way to look at the longevity of the device, saving people the hassle and money to go and buy another new laptop
 
 The future with DiagnOS
-One thing that we though was a huge opportunity that we wished we had were push notifications because it would alert the user to view an alert from the application and it encourages the user to quickly resolve it to continue keeping the laptop in great quality. We would also dive more deeper with the Mac OS to give it more functionality because many of the data we needed was blocked by the privacy rules. We also would implement more types of metrics to give the application more functionality of the device’s data 
+One thing that we though was a huge opportunity that we wished we had were push notifications because it would alert the user to view an alert from the application and it encourages the user to quickly resolve it to continue keeping the laptop in great quality. We would also dive more deeper with the Mac OS to give it more functionality because many of the data we needed was blocked by the privacy rules. We also would implement more types of metrics to give the application more functionality of the device’s data.
+
+Instructions
+To run our app, simply download the libraries in the requirements.txt and run main.py!
